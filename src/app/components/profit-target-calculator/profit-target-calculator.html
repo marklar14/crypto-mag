@@ -1,0 +1,80 @@
+<div class="bg-skin-panel-gradient p-6 rounded-2xl shadow-xl w-full text-skin-text h-full">
+  <h2 class="text-2xl font-bold mb-4 text-skin-primary">🎯 Profit Target Calculator</h2>
+
+  <!-- Inputs -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label for="balance" class="block text-sm mb-1 text-skin-muted">Balance ($)</label>
+      <input id="balance" type="number" [(ngModel)]="balance"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+    <div>
+      <label for="riskPercent" class="block text-sm mb-1 text-skin-muted">Risk (%)</label>
+      <input id="riskPercent" type="number" [(ngModel)]="riskPercent"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+    <div>
+      <label for="entryPrice" class="block text-sm mb-1 text-skin-muted">Entry Price</label>
+      <input id="entryPrice" type="number" [(ngModel)]="entryPrice"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+    <div>
+      <label for="targetPrice" class="block text-sm mb-1 text-skin-muted">Target Price</label>
+      <input id="targetPrice" type="number" [(ngModel)]="targetPrice"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+    <div>
+      <label for="tpSlRatio" class="block text-sm mb-1 text-skin-muted">TP/SL Ratio</label>
+      <input id="tpSlRatio" type="number" [(ngModel)]="tpSlRatio"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+    <div>
+      <label for="leverage" class="block text-sm mb-1 text-skin-muted">Leverage</label>
+      <input id="leverage" type="number" [(ngModel)]="leverage"
+             class="w-full p-2 rounded bg-skin-muted/10 border border-skin-muted/30 text-skin-text" />
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="p-6 bg-skin-muted/10 rounded-xl text-sm mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-skin-text">
+    <!-- Risk Settings -->
+    <div class="space-y-2">
+      <h3 class="text-skin-muted font-semibold text-xs uppercase tracking-wide">Risk Settings</h3>
+      <p>💥 <strong>Planned Risk:</strong> {{ riskAmount | currency:'USD':'symbol' }}</p>
+      <p>📉 <strong>Stop Loss Price:</strong> {{ stopLossPrice.toFixed(4) }}</p>
+      <p>📏 <strong>SL Distance:</strong> {{ slDistance.toFixed(4) }}</p>
+    </div>
+
+    <!-- Position Details -->
+    <div class="space-y-2">
+      <h3 class="text-skin-muted font-semibold text-xs uppercase tracking-wide">Position Details</h3>
+      <p>📦 <strong>Position Size:</strong> {{ positionSize.toLocaleString() }} units</p>
+      <p>💰 <strong>Notional Value:</strong> {{ notionalValue | currency:'USD':'symbol' }}</p>
+      <p>💵 <strong>USDT Required:</strong> {{ usdtRequired | currency:'USD':'symbol' }}</p>
+      <p>📊 <strong>Lots:</strong> {{ lots.toFixed(2) }}</p>
+    </div>
+
+    <!-- Profit & Loss -->
+    <div class="col-span-2 border-t border-skin-muted/30 pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <h3 class="text-skin-muted font-semibold text-xs uppercase tracking-wide">Target</h3>
+        <p>🎯 <strong>Target Profit:</strong> {{ targetProfit | currency:'USD':'symbol' }}</p>
+      </div>
+      <div>
+        <h3 class="text-skin-muted font-semibold text-xs uppercase tracking-wide">Stop Loss</h3>
+        <p>🛑 <strong>SL Loss (Real):</strong> {{ slLoss | currency:'USD':'symbol' }}</p>
+      </div>
+      <div>
+        <h3 class="text-skin-muted font-semibold text-xs uppercase tracking-wide">Risk / Reward</h3>
+        <p>🏛️ <strong>R/R Ratio:</strong> {{ rrRatio.toFixed(2) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset -->
+  <div class="mt-4">
+    <button (click)="reset()" class="px-4 py-2 text-sm font-medium bg-skin-secondary hover:opacity-90 rounded text-skin-bg transition">
+      Reset
+    </button>
+  </div>
+</div>
