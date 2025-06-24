@@ -1,59 +1,120 @@
-# CryptoMag
+# 🧠 CryptoMag – Trading Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
+CryptoMag is a modern Angular-based trading dashboard designed to assist cryptocurrency traders with smart tools such as a position size calculator and a trade opportunity screener.
 
-## Development server
+This project uses:
 
-To start a local development server, run:
+- **Angular 20**
+- **Tailwind CSS v3**
+- **SCSS styling**
+- **Husky + Commitlint for Git hooks**
+- **ESLint for code quality**
+
+---
+
+## 🚀 Getting Started
+
+Install dependencies:
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Start the local development server:
 
-## Code scaffolding
+```bash
+npm start
+```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Navigate to [http://localhost:4200](http://localhost:4200). The app will automatically reload on file changes.
+
+---
+
+## 🧪 Running Tests
+
+Unit tests (via [Karma](https://karma-runner.github.io)):
+
+```bash
+npm test
+```
+
+Lint your code:
+
+```bash
+npm run lint
+```
+
+(Optional) Format code:
+
+```bash
+npx prettier --write .
+```
+
+---
+
+## ⚙️ Code Generation
+
+Generate components, services, directives, etc. using Angular CLI:
 
 ```bash
 ng generate component component-name
+ng generate service service-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+List all schematics:
 
 ```bash
 ng generate --help
 ```
 
-## Building
+---
 
-To build the project run:
+## 🛠 Build for Production
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To build the application for production:
 
 ```bash
-ng test
+npm run build
 ```
 
-## Running end-to-end tests
+The output will be in the `dist/` folder.
 
-For end-to-end (e2e) testing, run:
+---
+
+## 🔒 Commit Hooks & Linting
+
+This project uses **Husky** to enforce quality:
+
+- **Pre-commit**: Linting + tests
+- **Commit message**: Checked via Commitlint
+
+To initialize Husky manually (after `npm install`):
 
 ```bash
-ng e2e
+npm run prepare
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 🧩 Planned Features (MVP)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- ✅ Position Size Calculator
+- ✅ Tailwind UI layout
+- ⏳ Trade Opportunity Screener (coming soon)
+- ⏳ Dark Mode Toggle
+- ⏳ Realtime Signals (via WebSocket or polling)
+
+---
+
+## 📚 Resources
+
+- [Angular CLI Docs](https://angular.dev/tools/cli)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Husky Git Hooks](https://typicode.github.io/husky/)
+- [Commitlint](https://commitlint.js.org/)
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

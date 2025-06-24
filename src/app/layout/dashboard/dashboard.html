@@ -1,0 +1,48 @@
+<div class="flex h-screen bg-skin-base text-skin-text">
+  <!-- Sidebar -->
+  <aside
+    class="bg-skin-sidebar-gradient w-64 p-4 backdrop-blur-md border-r border-white/10 shadow-lg"
+  >
+    <mag-logo></mag-logo>
+    <nav class="space-y-2 mt-6">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="font-semibold bg-skin-hover"
+        class="block p-2 rounded transition-colors hover:bg-skin-hover"
+      >
+        Crypto Da$H
+      </a>
+    </nav>
+  </aside>
+
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Topbar -->
+    <mag-header title="Welcome" />
+
+    <!-- TICKER PANEL -->
+    <div class="p-6 pt-4">
+      <mag-ticker-panel />
+    </div>
+
+    <!-- Content -->
+    <main class="flex-1 p-6 pt-0 overflow-y-auto m-0 space-y-6">
+      <!-- Two side by side -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section class="bg-skin-panel rounded-xl p-6 shadow-lg h-full">
+          <mag-profit-target-calculator />
+        </section>
+        <section class="bg-skin-panel rounded-xl p-6 shadow-lg h-full">
+          <mag-screener />
+        </section>
+      </div>
+
+      <!-- Insights section -->
+      <section class="bg-skin-panel rounded-xl p-6 shadow-lg">
+        <h2 class="text-xl font-semibold mb-2">🧠 Insights (coming soon)</h2>
+        <p class="text-skin-muted">Add trade signals, screener results, or portfolio summary here.</p>
+      </section>
+    </main>
+  </div>
+</div>

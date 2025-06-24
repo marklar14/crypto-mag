@@ -1,0 +1,46 @@
+<div class="bg-skin-panel-gradient p-6 rounded-2xl shadow-xl w-full text-skin-text h-full">
+  <h2 class="text-2xl font-bold mb-4 text-skin-primary flex items-center gap-2">
+    📊 Crypto Screener
+  </h2>
+
+  <div *ngIf="loading" class="text-skin-muted">Loading...</div>
+
+  <div *ngIf="!loading" class="overflow-auto">
+    <table class="min-w-full text-sm text-left border-collapse">
+      <thead>
+      <tr class="text-skin-muted border-b border-skin-muted/30">
+        <th class="py-2 px-3">Symbol</th>
+        <th class="py-2 px-3">Price</th>
+        <th class="py-2 px-3">24h Change</th>
+        <th class="py-2 px-3">Volume 24h</th>
+        <th class="py-2 px-3">RSI</th>
+        <th class="py-2 px-3">Signal</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let item of screenResults"
+        class="border-b border-skin-muted/20 hover:bg-skin-muted/5 transition"
+      >
+        <td class="py-2 px-3 font-semibold text-skin-text">{{ item.symbol }}</td>
+        <td class="py-2 px-3">{{ item.lastPrice }}</td>
+        <td
+          class="py-2 px-3 font-medium"
+          [ngClass]="{
+              'text-skin-success': item.changePercent > 0,
+              'text-skin-danger': item.changePercent < 0
+            }"
+        >
+          {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(2) }}%
+        </td>
+        <td class="py-2 px-3">{{ item.volume24h | number:'1.0-0' }}</td>
+        <td class="py-2 px-3" *ngIf="item.rsi; else dash">{{ item.rsi.toFixed(1) }}</td>
+        <ng-template #dash><td class="py-2 px-3 text-skin-muted">–</td></ng-template>
+        <td class="py-2 px-3 text-skin-warning font-semibold">
+          {{ item.signal || '–' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

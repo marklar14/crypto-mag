@@ -12,7 +12,7 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "mag",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -89,10 +89,26 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "karmaConfig": "karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "fe3eb358-11d7-441d-ad4b-c2128e0de8db",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }
