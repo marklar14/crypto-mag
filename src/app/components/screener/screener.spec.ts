@@ -8,7 +8,7 @@ describe('Screener', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Screener]
+      imports: [Screener],
     })
     .compileComponents();
 

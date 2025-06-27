@@ -1,22 +1,28 @@
-import { signal, computed } from '@angular/core';
+import { signalStore, withState, withMethods, withComputed, patchState } from '@ngrx/signals';
+import { computed } from '@angular/core';
 
-const accessToken = signal<string | null>(null);
-const clientId = signal<string | null>(null);
-
-export const isAuthenticated = computed(() => !!accessToken());
-
-export const authStore = {
-  accessToken,
-  clientId,
-  isAuthenticated,
-
-  setToken(token: string, client: string) {
-    accessToken.set(token);
-    clientId.set(client);
-  },
-
-  clear() {
-    accessToken.set(null);
-    clientId.set(null);
-  }
+type AuthState = {
+  accessToken: string | null;
+  clientId: string | null;
 };
+
+const initialAuthState: AuthState = {
+  accessToken: null,
+  clientId: null,
+};
+
+export const AuthStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialAuthState),
+  withMethods((store) => ({
+    setToken(accessToken: string, clientId: string): void {
+      patchState(store, { accessToken, clientId });
+    },
+    clear(): void {
+      patchState(store, { accessToken: null, clientId: null });
+    },
+  })),
+  withComputed((state) => ({
+    isAuthenticated: computed(() => !!state.accessToken()),
+  }))
+);
