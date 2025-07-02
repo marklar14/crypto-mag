@@ -5,6 +5,7 @@ export function mapTicker(api: TickerApi): Ticker {
   return {
     symbol: api.symbol,
     lastPrice: api.lastPrice,
+    previousPrice: api.previousPrice,
     price24hPcnt: api.price24hPcnt,
     volume24h: api.volume24h,
     markPrice: api.markPrice,

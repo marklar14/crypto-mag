@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { Screener } from './screener';
+import { SkeletonGridRows } from './skeleton-table-rows';
 
-describe('Screener', () => {
-  let component: Screener;
-  let fixture: ComponentFixture<Screener>;
+describe('SkeletonGridRows', () => {
+  let component: SkeletonGridRows;
+  let fixture: ComponentFixture<SkeletonGridRows>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Screener, HttpClientTestingModule],
+      imports: [SkeletonGridRows],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Screener);
+    fixture = TestBed.createComponent(SkeletonGridRows);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

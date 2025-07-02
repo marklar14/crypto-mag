@@ -1,7 +1,6 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { Ticker } from '../models/ticker';
 
-
 type TickerState = {
   tickers: Ticker[];
   isLoading: boolean;
@@ -9,7 +8,7 @@ type TickerState = {
 
 const initialState: TickerState = {
   tickers: [],
-  isLoading: false,
+  isLoading: true,
 };
 
 export const TickerStore = signalStore(
@@ -22,5 +21,5 @@ export const TickerStore = signalStore(
     setTickers(tickers: Ticker[]): void {
       patchState(store, { tickers, isLoading: false });
     },
-  }))
+  })),
 );
