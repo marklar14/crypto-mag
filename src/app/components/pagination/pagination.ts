@@ -1,0 +1,132 @@
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'mag-pagination',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="flex items-center justify-between mt-4">
+      <!-- Info -->
+      <div class="text-sm text-skin-muted">
+        @if (pagination) {
+          Showing {{ startItem }}-{{ endItem }} of {{ pagination.total }} results
+        }
+      </div>
+
+      <!-- Pagination Controls -->
+      @if (pagination) {
+        <div class="flex items-center gap-2">
+          <!-- Previous Button -->
+          <button
+            [disabled]="!pagination.hasPrev"
+            (click)="onPageChange.emit(pagination.page - 1)"
+            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-skin-muted/20 hover:bg-skin-muted/30 text-skin-text"
+          >
+            ← Previous
+          </button>
+
+          <!-- Page Numbers -->
+          <div class="flex gap-1">
+            @for (page of visiblePages; track page) {
+              @if (page === '...') {
+                <span class="px-3 py-2 text-skin-muted">...</span>
+              } @else {
+                <button
+                  [class.bg-skin-accent]="page === pagination.page"
+                  [class.text-skin-text]="page === pagination.page"
+                  [class.text-skin-muted]="page !== pagination.page"
+                  (click)="onPageChange.emit(typeof page === 'number' ? page : 1)"
+                  class="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-skin-muted/20"
+                >
+                  {{ page }}
+                </button>
+              }
+            }
+          </div>
+
+          <!-- Next Button -->
+          <button
+            [disabled]="!pagination.hasNext"
+            (click)="onPageChange.emit(pagination.page + 1)"
+            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-skin-muted/20 hover:bg-skin-muted/30 text-skin-text"
+          >
+            Next →
+          </button>
+        </div>
+      }
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
+})
+export class Pagination {
+  @Input() pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  } | null = null;
+
+  @Output() onPageChange = new EventEmitter<number>();
+
+  get startItem(): number {
+    if (!this.pagination) return 0;
+    return (this.pagination.page - 1) * this.pagination.limit + 1;
+  }
+
+  get endItem(): number {
+    if (!this.pagination) return 0;
+    return Math.min(this.pagination.page * this.pagination.limit, this.pagination.total);
+  }
+
+  get visiblePages(): (number | string)[] {
+    if (!this.pagination) return [];
+
+    const current = this.pagination.page;
+    const total = this.pagination.totalPages;
+    const pages: (number | string)[] = [];
+
+    if (total <= 7) {
+      // Show all pages if total is small
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show smart pagination
+      if (current <= 4) {
+        // Near start
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(total);
+      } else if (current >= total - 3) {
+        // Near end
+        pages.push(1);
+        pages.push('...');
+        for (let i = total - 4; i <= total; i++) {
+          pages.push(i);
+        }
+      } else {
+        // Middle
+        pages.push(1);
+        pages.push('...');
+        for (let i = current - 1; i <= current + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(total);
+      }
+    }
+
+    return pages;
+  }
+}

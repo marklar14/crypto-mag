@@ -3,6 +3,11 @@ const { fontFamily } = require('tailwindcss/defaultTheme');
 module.exports = {
   content: ["./src/**/*.{html,ts,scss}"],
   darkMode: 'class',
+  safelist: [
+    {
+      pattern: /grid-cols-(\d+)/, 
+    },
+  ],
   theme: {
     extend: {
       colors: {
@@ -21,7 +26,6 @@ module.exports = {
           danger: 'var(--color-danger)',
           warning: 'var(--color-warning)',
           accent: 'var(--color-accent)',
-
         },
       },
       backgroundImage: {

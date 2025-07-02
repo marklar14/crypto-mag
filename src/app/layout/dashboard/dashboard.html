@@ -28,21 +28,22 @@
 
     <!-- Content -->
     <main class="flex-1 p-6 pt-0 overflow-y-auto m-0 space-y-6">
-      <!-- Two side by side -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <section class="bg-skin-panel rounded-xl p-6 shadow-lg h-full">
+      <!-- Main screener section - full width -->
+      <section class="bg-skin-panel rounded-xl p-6 shadow-lg">
+        <mag-screener />
+      </section>
+
+      <!-- Bottom row with profit calculator and DCA calculator -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="bg-skin-panel rounded-xl p-6 shadow-lg lg:col-span-1">
           <mag-profit-target-calculator />
         </section>
-        <section class="bg-skin-panel rounded-xl p-6 shadow-lg h-full">
-          <mag-screener />
+        
+        <!-- DCA Risk Management Calculator -->
+        <section class="bg-skin-panel rounded-xl p-6 shadow-lg lg:col-span-2">
+          <mag-dca-risk-calculator />
         </section>
       </div>
-
-      <!-- Insights section -->
-      <section class="bg-skin-panel rounded-xl p-6 shadow-lg">
-        <h2 class="text-xl font-semibold mb-2">🧠 Insights (coming soon)</h2>
-        <p class="text-skin-muted">Add trade signals, screener results, or portfolio summary here.</p>
-      </section>
     </main>
   </div>
 </div>

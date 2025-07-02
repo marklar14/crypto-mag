@@ -100,7 +100,7 @@ npm run prepare
 
 - ✅ Position Size Calculator
 - ✅ Tailwind UI layout
-- ⏳ Trade Opportunity Screener (coming soon)
+- ⏳ Trade Opportunity ScreenerApi (coming soon)
 - ⏳ Dark Mode Toggle
 - ⏳ Realtime Signals (via WebSocket or polling)
 

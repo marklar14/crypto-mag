@@ -4,6 +4,7 @@ export type Ticker = Pick<
   TickerApi,
   | 'symbol'
   | 'lastPrice'
+  | 'previousPrice'
   | 'price24hPcnt'
   | 'volume24h'
   | 'markPrice'

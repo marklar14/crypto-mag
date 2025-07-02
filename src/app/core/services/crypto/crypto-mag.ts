@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { CryptoMagApi } from '../api/crypto-mag-api';
+import { CryptoMagApi } from '../api/crypto-mag/crypto-mag-api';
 import { map, Observable } from 'rxjs';
 import { Ticker } from '../../models/ticker';
 import { mapTickers } from '../../models/mappers/ticker.mapper';

@@ -1,6 +1,7 @@
 export interface TickerApi {
   symbol: string;
   lastPrice: number;
+  previousPrice: number;
   indexPrice: number;
   markPrice: number;
   prevPrice24h: number;

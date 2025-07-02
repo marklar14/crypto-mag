@@ -1,0 +1,186 @@
+<div class="bg-skin-panel-gradient p-6 rounded-2xl shadow-xl w-full text-skin-text">
+  <h2 class="text-2xl font-bold mb-4 text-skin-primary">📈 DCA Risk Management Calculator</h2>
+
+  <!-- Input Parameters -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Entry Price ($)</label>
+      <input 
+        type="number" 
+        [value]="entryPrice()" 
+        (input)="entryPrice.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Target Sell Price ($)</label>
+      <input 
+        type="number" 
+        [value]="targetSellPrice()" 
+        (input)="targetSellPrice.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Balance ($)</label>
+      <input 
+        type="number" 
+        [value]="balance()" 
+        (input)="balance.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Risk (%)</label>
+      <input 
+        type="number" 
+        [value]="riskPercent()" 
+        (input)="riskPercent.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Base Leverage</label>
+      <input 
+        type="number" 
+        [value]="leverage()" 
+        (input)="leverage.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Number of Levels</label>
+      <input 
+        type="number" 
+        [value]="numberOfLevels()" 
+        (input)="numberOfLevels.set(+($any($event.target).value))"
+        min="2" max="10"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+    <div>
+      <label class="block text-sm mb-1 text-skin-muted">Max Pullback (%)</label>
+      <input 
+        type="number" 
+        [value]="pullbackPercent()" 
+        (input)="pullbackPercent.set(+($any($event.target).value))"
+        class="w-full p-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition" 
+      />
+    </div>
+  </div>
+
+  <!-- Grow Leverage Checkbox -->
+  <div class="mb-6">
+    <label class="inline-flex items-center cursor-pointer">
+      <input 
+        type="checkbox" 
+        [checked]="growLeverage()" 
+        (change)="growLeverage.set($any($event.target).checked)"
+        class="mr-3 w-4 h-4 text-skin-accent bg-skin-panel border-skin-muted rounded focus:ring-skin-accent focus:ring-2"
+      />
+      <span class="text-sm font-medium text-skin-text">
+        🚀 Grow Leverage (exponential: 2x → 3x → 5x → 8x → 12x)
+      </span>
+    </label>
+  </div>
+
+  <!-- Summary -->
+  <div class="mb-6 p-4 bg-skin-panel rounded-xl border border-skin-muted/20">
+    <h3 class="text-lg font-semibold mb-3 text-skin-primary">📊 Summary</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 text-sm">
+      <div>
+        <span class="text-skin-muted">Total Risk:</span>
+        <span class="ml-2 font-semibold text-skin-danger">${{ totalRiskAmount() | number:'1.0-2' }}</span>
+      </div>
+      <div>
+        <span class="text-skin-muted">Average Entry:</span>
+        <span class="ml-2 font-semibold">${{ averageEntryPrice() | number:'1.0-2' }}</span>
+      </div>
+      <div>
+        <span class="text-skin-muted">Target Price:</span>
+        <span class="ml-2 font-semibold text-skin-accent">${{ targetSellPrice() | number:'1.0-2' }}</span>
+      </div>
+      <div>
+        <span class="text-skin-muted">Avg Profit %:</span>
+        <span class="ml-2 font-semibold" [ngClass]="getProfitColor(averageProfitPercent())">{{ averageProfitPercent() | number:'1.0-1' }}%</span>
+      </div>
+      <div>
+        <span class="text-skin-muted">Total Profit:</span>
+        <span class="ml-2 font-semibold" [ngClass]="getProfitColor(totalProfitIfTargetHit())">${{ totalProfitIfTargetHit() | number:'1.0-2' }}</span>
+      </div>
+      <div>
+        <span class="text-skin-muted">USDT Required:</span>
+        <span class="ml-2 font-semibold">${{ totalUsdtRequired() | number:'1.0-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DCA Levels Table -->
+  <div class="mb-6">
+    <h3 class="text-lg font-semibold mb-3 text-skin-primary">🎯 DCA Levels</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-skin-muted/30">
+            <th class="text-left p-2 text-skin-muted">Level</th>
+            <th class="text-left p-2 text-skin-muted">Entry Price</th>
+            <th class="text-left p-2 text-skin-muted">Pullback</th>
+            <th class="text-left p-2 text-skin-muted">Position Size</th>
+            <th class="text-left p-2 text-skin-muted">Leverage</th>
+            <th class="text-left p-2 text-skin-muted">Target Profit %</th>
+            <th class="text-left p-2 text-skin-muted">Profit if Target Hit</th>
+            <th class="text-left p-2 text-skin-muted">Risk Amount</th>
+            <th class="text-left p-2 text-skin-muted">Cumulative Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (level of dcaLevels(); track level.level) {
+            <tr 
+              class="border-b border-skin-muted/10 hover:bg-skin-panel/50 transition-colors"
+              [ngClass]="getLevelBgColor(level)"
+            >
+              <td class="p-2 font-semibold">#{{ level.level }}</td>
+              <td class="p-2">${{ level.entryPrice | number:'1.0-2' }}</td>
+              <td class="p-2" [ngClass]="getLevelColor(level)">
+                {{ level.pullbackPercent | number:'1.0-1' }}%
+              </td>
+              <td class="p-2">{{ level.positionSize | number:'1.0-2' }} units</td>
+              <td class="p-2 font-semibold" [ngClass]="getLeverageColor(level.leverage)">
+                {{ level.leverage }}x
+              </td>
+              <td class="p-2 font-semibold" [ngClass]="getProfitColor(level.targetProfit)">
+                {{ level.targetProfit > 0 ? '+' : '' }}{{ level.targetProfit | number:'1.0-1' }}%
+              </td>
+              <td class="p-2 font-semibold" [ngClass]="getProfitColor(level.profitIfTargetHit)">
+                {{ level.profitIfTargetHit > 0 ? '+' : '' }}${{ level.profitIfTargetHit | number:'1.0-2' }}
+              </td>
+              <td class="p-2 text-skin-danger">${{ level.riskAmount | number:'1.0-2' }}</td>
+              <td class="p-2 text-skin-warning">${{ level.cumulativeRisk | number:'1.0-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Strategy Explanation -->
+  <div class="mb-6 p-4 bg-skin-panel rounded-xl border border-skin-muted/20">
+    <h3 class="text-lg font-semibold mb-3 text-skin-primary">💡 Strategy</h3>
+    <div class="text-sm text-skin-muted space-y-2">
+      <p>• <strong>Progressive DCA:</strong> Larger positions at lower prices to reduce average entry</p>
+      <p>• <strong>Risk Management:</strong> Total risk limited to {{ riskPercent() }}% of balance (${{ totalRiskAmount() | number:'1.0-2' }})</p>
+      <p>• <strong>Leverage:</strong> {{ leverage() }}x leverage reduces capital requirement</p>
+      <p>• <strong>Pullback Strategy:</strong> Buy on {{ numberOfLevels() }} levels up to {{ pullbackPercent() }}% pullback</p>
+    </div>
+  </div>
+
+  <!-- Reset Button -->
+  <div class="flex justify-end">
+    <button 
+      (click)="reset()" 
+      class="px-4 py-2 bg-skin-accent hover:bg-skin-accent/80 text-skin-text font-semibold rounded-lg transition-colors"
+    >
+      🔄 Reset
+    </button>
+  </div>
+</div> 

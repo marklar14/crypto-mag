@@ -3,44 +3,256 @@
     📊 Crypto Screener
   </h2>
 
-  <div *ngIf="loading" class="text-skin-muted">Loading...</div>
-
-  <div *ngIf="!loading" class="overflow-auto">
-    <table class="min-w-full text-sm text-left border-collapse">
-      <thead>
-      <tr class="text-skin-muted border-b border-skin-muted/30">
-        <th class="py-2 px-3">Symbol</th>
-        <th class="py-2 px-3">Price</th>
-        <th class="py-2 px-3">24h Change</th>
-        <th class="py-2 px-3">Volume 24h</th>
-        <th class="py-2 px-3">RSI</th>
-        <th class="py-2 px-3">Signal</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr
-        *ngFor="let item of screenResults"
-        class="border-b border-skin-muted/20 hover:bg-skin-muted/5 transition"
-      >
-        <td class="py-2 px-3 font-semibold text-skin-text">{{ item.symbol }}</td>
-        <td class="py-2 px-3">{{ item.lastPrice }}</td>
-        <td
-          class="py-2 px-3 font-medium"
-          [ngClass]="{
-              'text-skin-success': item.changePercent > 0,
-              'text-skin-danger': item.changePercent < 0
-            }"
-        >
-          {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent.toFixed(2) }}%
-        </td>
-        <td class="py-2 px-3">{{ item.volume24h | number:'1.0-0' }}</td>
-        <td class="py-2 px-3" *ngIf="item.rsi; else dash">{{ item.rsi.toFixed(1) }}</td>
-        <ng-template #dash><td class="py-2 px-3 text-skin-muted">–</td></ng-template>
-        <td class="py-2 px-3 text-skin-warning font-semibold">
-          {{ item.signal || '–' }}
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <!-- Timeframe Selection -->
+  <div class="flex gap-2 mb-4">
+    <button 
+      *ngFor="let tf of ['tf5m', 'tf15m', 'tf1h', 'tf1d']"
+      (click)="setTimeframe(tf)"
+      [ngClass]="{
+        'bg-skin-accent text-skin-text': selectedTimeframe === tf,
+        'bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30': selectedTimeframe !== tf
+      }"
+      class="px-4 py-2 rounded-lg font-medium transition-colors"
+    >
+      {{ getTimeframeLabel(tf) }}
+    </button>
   </div>
+
+  <!-- Filter input + signal type filter -->
+  <div class="flex items-center justify-between mb-4 gap-4 flex-wrap">
+    <div class="flex items-center gap-2">
+      <input
+        #filterInput
+        type="text"
+        class="px-3 py-2 rounded-lg bg-skin-panel border border-skin-muted text-skin-text focus:outline-none focus:ring-2 focus:ring-skin-accent transition w-full max-w-xs"
+        placeholder="Filter by symbol (e.g. BTC)"
+        [value]="filterText()"
+        (input)="filterText.set(filterInput.value)"
+      />
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="text-skin-muted text-sm">Filter by signal:</label>
+      <select
+        class="p-2 rounded bg-skin-panel border border-skin-muted text-skin-text"
+        [value]="selectedSignalType() || ''"
+        (change)="selectedSignalType.set($any($event.target).value || null)"
+      >
+        <option value="">All</option>
+        @for (type of signalTypes; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="text-skin-muted text-sm">Market Cap:</label>
+      <select
+        class="p-2 rounded bg-skin-panel border border-skin-muted text-skin-text"
+        [value]="selectedMarketCap() || ''"
+        (change)="selectedMarketCap.set($any($event.target).value || null)"
+      >
+        @for (range of marketCapRanges; track range.value) {
+          <option [value]="range.value">{{ range.label }}</option>
+        }
+      </select>
+    </div>
+    <button
+      class="px-4 py-2 rounded-lg bg-skin-accent text-skin-text font-semibold shadow hover:bg-skin-accent/80 transition"
+      (click)="refresh()"
+      [disabled]="loading()"
+      title="Refresh screener data"
+    >
+      🔄 Refresh
+    </button>
+  </div>
+
+  <!-- Header -->
+  <div class="grid grid-cols-10 gap-4 text-skin-muted text-sm font-medium border-b border-skin-muted/30 pb-2 mb-2 select-none">
+    <div title="Trading symbol (pair)" (click)="onSort('symbol')" class="cursor-pointer flex items-center gap-1">
+      Symbol
+      @if (sortBy() === 'symbol') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="Last traded price" (click)="onSort('lastPrice')" class="cursor-pointer flex items-center gap-1">
+      Price
+      @if (sortBy() === 'lastPrice') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="Market capitalization (price × supply)" (click)="onSort('marketCap')" class="cursor-pointer flex items-center gap-1">
+      Market Cap
+      @if (sortBy() === 'marketCap') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div [title]="getTimeframeLabel(selectedTimeframe) + ' % change'" (click)="onSort('changePercent')" class="cursor-pointer flex items-center gap-1">
+      {{ getTimeframeLabel(selectedTimeframe) }} Change
+      @if (sortBy() === 'changePercent') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div [title]="getTimeframeLabel(selectedTimeframe) + ' volume traded'" (click)="onSort('volume24h')" class="cursor-pointer flex items-center gap-1">
+      {{ getTimeframeLabel(selectedTimeframe) }} Volume
+      @if (sortBy() === 'volume24h') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="Relative Strength Index (RSI). <30 = oversold (bullish), >70 = overbought (bearish)" (click)="onSort('rsi')" class="cursor-pointer flex items-center gap-1">
+      RSI
+      @if (sortBy() === 'rsi') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="MACD Histogram. >0 bullish, <0 bearish" (click)="onSort('macdHist')" class="cursor-pointer flex items-center gap-1">
+      MACD
+      @if (sortBy() === 'macdHist') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="ADX (trend strength). >25 = strong trend" (click)="onSort('adx')" class="cursor-pointer flex items-center gap-1">
+      ADX
+      @if (sortBy() === 'adx') {
+        <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
+      }
+    </div>
+    <div title="Signal type and explanation">Signal</div>
+    <div title="Open TradingView chart">Chart</div>
+  </div>
+
+  <!-- Skeleton loading -->
+  @if (loading()) {
+    <mag-skeleton-grid-rows [rowCount]="itemsPerPage" [columnCount]="10" />
+  } @else {
+    <!-- No results -->
+    @if (filteredResults.length === 0) {
+      <div class="text-skin-muted">No results found for {{ getTimeframeLabel(selectedTimeframe) }} timeframe.</div>
+    }
+
+    <!-- Results -->
+    @for (item of filteredResults; let i = $index; track item.symbol) {
+      @let signal = item.signal || '';
+      <div class="grid grid-cols-10 gap-4 py-2 border-b border-skin-muted/10 transition items-center"
+        [ngClass]="{
+          'bg-skin-panel': i % 2 === 0,
+          'bg-skin-panel-alt': i % 2 === 1
+        }">
+        <div class="font-semibold text-skin-text">
+          {{ item.symbol }}
+        </div>
+        <div>{{ item.lastPrice ? (item.lastPrice | number: '1.2-2') : '–' }}</div>
+        <div>{{ item.marketCap ? (item.marketCap | number: '1.0-0') : '–' }}</div>
+        <div
+          [ngClass]="{
+            'text-skin-success': item.changePercent !== undefined && item.changePercent > 0,
+            'text-skin-danger': item.changePercent !== undefined && item.changePercent < 0,
+            'text-skin-muted': item.changePercent === undefined || item.changePercent === 0
+          }">
+          @if (item.changePercent !== undefined) {
+            <span class="flex items-center gap-1">
+              <span class="text-xs">{{ item.changePercent > 0 ? '▲' : item.changePercent < 0 ? '▼' : '→' }}</span>
+              {{ item.changePercent > 0 ? '+' : '' }}{{ item.changePercent | number: '1.2-2' }}%
+            </span>
+            @if (item.previousPrice) {
+              <div class="text-xs text-skin-muted">
+                ({{ item.previousPrice | number: '1.2-2' }} → {{ item.lastPrice | number: '1.2-2' }})
+              </div>
+            }
+          } @else { – }
+        </div>
+        <div>{{ item.volume24h ? (item.volume24h | number: '1.0-0') : '–' }}</div>
+        <div
+          [ngClass]="{
+            'text-skin-danger': item.rsi && item.rsi > 70,
+            'text-skin-success': item.rsi && item.rsi < 30,
+            'text-skin-warning': item.rsi && item.rsi >= 30 && item.rsi <= 70
+          }">
+          {{ item.rsi !== undefined ? (item.rsi | number: '1.1') : '–' }}
+        </div>
+        <div
+          [ngClass]="{
+            'text-skin-success': item.macdHist && item.macdHist > 0,
+            'text-skin-danger': item.macdHist && item.macdHist < 0,
+            'text-skin-muted': !item.macdHist
+          }">
+          {{ item.macdHist !== undefined ? (item.macdHist | number: '1.3') : '–' }}
+        </div>
+        <div
+          [ngClass]="{
+            'text-skin-success': item.adx && item.adx > 25,
+            'text-skin-warning': item.adx && item.adx <= 25,
+            'text-skin-muted': !item.adx
+          }">
+          {{ item.adx !== undefined ? (item.adx | number: '1.0') : '–' }}
+        </div>
+        <div>
+          @if (item.signal) {
+            <span
+              [ngClass]="{
+                'text-skin-success': isBullishSignal(item.signal),
+                'text-skin-danger': isBearishSignal(item.signal),
+                'text-skin-warning': isNeutralSignal(item.signal)
+              }">
+              {{ item.signal }}
+            </span>
+            @if (item.description) {
+              <div class="mt-2 p-2 bg-skin-panel/60 rounded border border-skin-muted/20 cursor-pointer hover:bg-skin-panel/70 transition-colors"
+                   (click)="toggleDescription(item.symbol)"
+                   [title]="'Click to expand details'">
+                <div
+                  class="text-xs font-bold mb-1"
+                  [ngClass]="{
+                    'text-skin-success': isBullishSignal(item.signal),
+                    'text-skin-danger': isBearishSignal(item.signal),
+                    'text-skin-warning': isNeutralSignal(item.signal)
+                  }"
+                >
+                  {{ item.description.title }}
+                </div>
+                <div class="text-xs text-skin-muted mb-1">
+                  {{ item.description.description }}
+                </div>
+                @if (expandedDescriptions()[item.symbol]) {
+                  <div class="mt-2 pt-2 border-t border-skin-muted/20 space-y-2">
+                    <div class="text-xs text-skin-text">
+                      <strong>Reasoning:</strong>
+                      <span style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ item.description.reasoning }}</span>
+                    </div>
+                    @if (item.description.values && getDescriptionValueKeys(item.description.values).length > 0) {
+                      <div class="mt-2 text-xs">
+                        <strong>Key Values:</strong>
+                        <table class="w-full mt-1">
+                          <tr *ngFor="let key of getDescriptionValueKeys(item.description.values)">
+                            <td class="pr-2 text-skin-muted">{{ key }}</td>
+                            <td class="font-semibold text-skin-accent">{{ item.description.values[key] }}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          } @else {
+            <span class="text-skin-muted">–</span>
+          }
+        </div>
+        <div>
+          <a 
+            [href]="'https://www.tradingview.com/chart/?symbol=BINANCE:' + item.symbol" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="text-skin-muted hover:text-skin-accent transition-colors"
+            title="Open TradingView chart"
+          >
+            📈
+          </a>
+        </div>
+      </div>
+    }
+    <!-- Pagination -->
+    <mag-pagination
+      [pagination]="pagination()"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
 </div>
