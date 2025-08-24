@@ -1,9 +1,14 @@
 <div class="bg-skin-panel-gradient p-6 rounded-2xl shadow-xl w-full text-skin-text h-full">
   <h2 class="text-2xl font-bold mb-4 text-skin-primary flex items-center gap-2">
     📊 Crypto Screener
+    @if (autoRefreshEnabled()) {
+      <div class="flex items-center gap-2 text-sm font-normal">
+        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+        <span class="text-skin-muted">Auto-refresh: {{ autoRefreshInterval() }}s</span>
+      </div>
+    }
   </h2>
 
-  <!-- Timeframe Selection -->
   <div class="flex gap-2 mb-4">
     <button 
       *ngFor="let tf of ['tf5m', 'tf15m', 'tf1h', 'tf1d']"
@@ -18,7 +23,6 @@
     </button>
   </div>
 
-  <!-- Filter input + signal type filter -->
   <div class="flex items-center justify-between mb-4 gap-4 flex-wrap">
     <div class="flex items-center gap-2">
       <input
@@ -63,9 +67,39 @@
     >
       🔄 Refresh
     </button>
+    
+    <div class="flex items-center gap-3 bg-skin-panel/60 px-3 py-2 rounded-lg border border-skin-muted/20">
+      <label class="flex items-center gap-2 text-sm text-skin-muted cursor-pointer">
+        <input
+          type="checkbox"
+          [checked]="autoRefreshEnabled()"
+          (change)="toggleAutoRefresh()"
+          class="w-4 h-4 text-skin-accent bg-skin-panel border-skin-muted rounded focus:ring-skin-accent"
+        />
+        Auto-refresh
+      </label>
+      
+      @if (autoRefreshEnabled()) {
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-skin-muted">Every:</span>
+          <select
+            [value]="autoRefreshInterval()"
+            (change)="updateAutoRefreshInterval(+$any($event.target).value)"
+            class="px-2 py-1 text-xs bg-skin-panel border border-skin-muted rounded text-skin-text focus:outline-none focus:ring-1 focus:ring-skin-accent"
+          >
+            @for (option of refreshIntervalOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+        
+        <div class="text-xs text-skin-muted">
+          Next: {{ getNextRefreshTime() }}
+        </div>
+      }
+    </div>
   </div>
 
-  <!-- Header -->
   <div class="grid grid-cols-10 gap-4 text-skin-muted text-sm font-medium border-b border-skin-muted/30 pb-2 mb-2 select-none">
     <div title="Trading symbol (pair)" (click)="onSort('symbol')" class="cursor-pointer flex items-center gap-1">
       Symbol
@@ -93,7 +127,7 @@
     </div>
     <div [title]="getTimeframeLabel(selectedTimeframe) + ' volume traded'" (click)="onSort('volume24h')" class="cursor-pointer flex items-center gap-1">
       {{ getTimeframeLabel(selectedTimeframe) }} Volume
-      @if (sortBy() === 'volume24h') {
+      @if (sortBy() === 'changePercent') {
         <span>{{ sortOrder() === 'asc' ? '▲' : '▼' }}</span>
       }
     </div>
@@ -119,18 +153,14 @@
     <div title="Open TradingView chart">Chart</div>
   </div>
 
-  <!-- Skeleton loading -->
   @if (loading()) {
     <mag-skeleton-grid-rows [rowCount]="itemsPerPage" [columnCount]="10" />
   } @else {
-    <!-- No results -->
     @if (filteredResults.length === 0) {
       <div class="text-skin-muted">No results found for {{ getTimeframeLabel(selectedTimeframe) }} timeframe.</div>
     }
 
-    <!-- Results -->
     @for (item of filteredResults; let i = $index; track item.symbol) {
-      @let signal = item.signal || '';
       <div class="grid grid-cols-10 gap-4 py-2 border-b border-skin-muted/10 transition items-center"
         [ngClass]="{
           'bg-skin-panel': i % 2 === 0,
@@ -249,7 +279,6 @@
         </div>
       </div>
     }
-    <!-- Pagination -->
     <mag-pagination
       [pagination]="pagination()"
       (onPageChange)="onPageChange($event)"

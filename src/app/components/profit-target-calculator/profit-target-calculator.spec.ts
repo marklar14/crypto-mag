@@ -8,10 +8,7 @@ describe('ProfitTargetCalculator logic', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
     component = new ProfitTargetCalculator();
@@ -100,11 +97,11 @@ describe('ProfitTargetCalculator logic', () => {
     expect(component.direction).toBe('long');
     expect((component as any).autoTarget).toBeTrue();
 
-    // Očekáváme přepočítaný targetPrice, ne statickou hodnotu 2.8
-    const expectedTP = component.entryPrice + (component.desiredProfit + component.totalFees) / component.positionSize;
+    const expectedTP =
+      component.entryPrice +
+      (component.desiredProfit + component.totalFees) / component.positionSize;
     expect(component.targetPrice).toBeCloseTo(expectedTP, 4);
   });
-
 
   it('should calculate targetPrice from desiredProfit (autoTarget = true)', () => {
     component.desiredProfit = 25;

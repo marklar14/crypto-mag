@@ -1,0 +1,378 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+// Custom range slider styling
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  
+  &::-webkit-slider-track {
+    background: var(--skin-muted);
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--skin-accent);
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    
+    &:hover {
+      background: var(--skin-accent-hover);
+    }
+  }
+  
+  &::-moz-range-track {
+    background: var(--skin-muted);
+    height: 4px;
+    border-radius: 2px;
+    border: none;
+  }
+  
+  &::-moz-range-thumb {
+    background: var(--skin-accent);
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    
+    &:hover {
+      background: var(--skin-accent-hover);
+    }
+  }
+}
+
+// Animation for scanning indicator
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+// Signal strength indicators
+.signal-strong {
+  border-left: 4px solid #10b981;
+}
+
+.signal-medium {
+  border-left: 4px solid #f59e0b;
+}
+
+.signal-weak {
+  border-left: 4px solid #6b7280;
+}
+
+// Hover effects for signal rows
+.signal-row {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Alert animations
+@keyframes alertPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.alert-pulse {
+  animation: alertPulse 2s infinite;
+}
+
+// Responsive grid adjustments
+@media (max-width: 768px) {
+  .grid-cols-12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  
+  .col-span-2 {
+    grid-column: span 2;
+  }
+  
+  .col-span-1 {
+    grid-column: span 1;
+  }
+}
+
+// Custom scrollbar for the signals table
+.signals-table {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--skin-panel);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--skin-muted);
+    border-radius: 3px;
+    
+    &:hover {
+      background: var(--skin-accent);
+    }
+  }
+}
+
+// Loading skeleton animation
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--skin-muted) 25%, var(--skin-panel) 50%, var(--skin-muted) 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+// Confidence level colors
+.confidence-high {
+  color: #10b981;
+}
+
+.confidence-medium {
+  color: #f59e0b;
+}
+
+.confidence-low {
+  color: #ef4444;
+}
+
+// Volume spike indicators
+.volume-high {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.volume-medium {
+  color: #f59e0b;
+}
+
+.volume-low {
+  color: var(--skin-muted);
+}
+
+// Breakout indicators
+.breakout-bullish {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+}
+
+.breakout-bearish {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+}
+
+// Timeframe badges
+.timeframe-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  
+  &.tf5m {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+  }
+  
+  &.tf15m {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+  }
+  
+  &.tf1h {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+  }
+}
+
+// Signal type icons
+.signal-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+// Chart link hover effect
+.chart-link {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+    color: var(--skin-accent);
+  }
+}
+
+// Notification button states
+.notification-btn {
+  &.enabled {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+  }
+  
+  &.disabled {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+  }
+}
+
+// Real-time updates indicator
+.real-time-indicator {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+} 
+
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.card-signal {
+  background: var(--skin-panel);
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-signal:hover {
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.14);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.card-signal .text-xs {
+  font-size: 0.85rem;
+}
+
+.card-signal .text-lg {
+  font-size: 1.15rem;
+}
+
+.card-signal .font-bold {
+  font-weight: 700;
+}
+
+.card-signal .font-semibold {
+  font-weight: 600;
+}
+
+.card-signal .text-skin-muted {
+  color: var(--skin-muted);
+}
+
+.card-signal .text-skin-primary {
+  color: var(--skin-primary);
+}
+
+.card-signal .text-skin-accent {
+  color: var(--skin-accent);
+}
+
+.card-signal .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-signal .flex {
+  display: flex;
+}
+
+.card-signal .justify-between {
+  justify-content: space-between;
+}
+
+.card-signal .items-end {
+  align-items: flex-end;
+}
+
+.card-signal .gap-1 {
+  gap: 0.25rem;
+}
+
+.card-signal .gap-2 {
+  gap: 0.5rem;
+}
+
+.card-signal .gap-3 {
+  gap: 0.75rem;
+}
+
+.card-signal .gap-4 {
+  gap: 1rem;
+}
+
+.card-signal .mt-2 {
+  margin-top: 0.5rem;
+}
+
+.card-signal .mt-4 {
+  margin-top: 1rem;
+}
+
+.card-signal .mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.card-signal .min-h-\[320px\] {
+  min-height: 320px;
+}
+
+.card-signal .max-w-\[70%\] {
+  max-width: 70%;
+} 

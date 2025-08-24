@@ -1,0 +1,441 @@
+<div class="bg-skin-panel-gradient p-6 rounded-2xl shadow-xl w-full text-skin-text h-full">
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <h2 class="text-2xl font-bold text-skin-primary">🚀 Real-time Signal Scanner</h2>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full" [ngClass]="{
+          'bg-green-500 animate-pulse': isScanning() && !isLoading(),
+          'bg-yellow-500 animate-spin': isLoading(),
+          'bg-red-500': !isScanning() && !isLoading()
+        }"></div>
+        <span class="text-sm text-skin-muted">
+          {{ isLoading() ? 'Loading...' : (isScanning() ? 'Scanning...' : 'Stopped') }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <button
+        (click)="requestNotificationPermission()"
+        class="px-3 py-1 text-xs bg-skin-accent/20 text-skin-accent rounded-lg hover:bg-skin-accent/30 transition"
+        title="Enable notifications for high-confidence signals"
+      >
+        🔔 Notifications
+      </button>
+      
+      <button
+        (click)="isScanning() ? stopScanning() : startScanning()"
+        [ngClass]="{
+          'bg-red-500 hover:bg-red-600': isScanning(),
+          'bg-green-500 hover:bg-green-600': !isScanning()
+        }"
+        class="px-4 py-2 rounded-lg text-white font-semibold transition"
+      >
+        {{ isScanning() ? '⏹️ Stop' : '▶️ Start' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Scan Timeframes</h3>
+             <div class="flex flex-wrap gap-2">
+         @for (tf of [TIMEFRAMES.TF1M, TIMEFRAMES.TF5M, TIMEFRAMES.TF15M, TIMEFRAMES.TF1H, TIMEFRAMES.TF4H]; track tf) {
+           <button
+             (click)="toggleTimeframe(tf)"
+             [ngClass]="{
+               'bg-skin-accent text-skin-text': selectedTimeframes().includes(tf),
+               'bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30': !selectedTimeframes().includes(tf)
+             }"
+             class="px-3 py-1 rounded text-xs font-medium transition"
+           >
+             {{ getTimeframeLabel(tf) }}
+           </button>
+         }
+       </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Confidence Threshold</h3>
+      <div class="flex items-center gap-2">
+        <button 
+          (click)="signalThreshold.set(Math.max(40, signalThreshold() - 5))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          min="40"
+          max="95"
+          step="5"
+          [value]="signalThreshold()"
+          (input)="signalThreshold.set(+($any($event.target).value))"
+          class="w-16 text-center bg-skin-panel border border-skin-muted rounded px-2 py-1 text-sm"
+        />
+        <button 
+          (click)="signalThreshold.set(Math.min(95, signalThreshold() + 5))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          +
+        </button>
+        <span class="text-sm font-semibold ml-2" [ngClass]="getConfidenceColor(signalThreshold())">
+          {{ signalThreshold() }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Scan Interval</h3>
+      <div class="flex items-center gap-2">
+        <button 
+          (click)="scanInterval.set(Math.max(30, scanInterval() - 30))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          min="30"
+          max="300"
+          step="30"
+          [value]="scanInterval()"
+          (input)="scanInterval.set(+($any($event.target).value))"
+          class="w-16 text-center bg-skin-panel border border-skin-muted rounded px-2 py-1 text-sm"
+        />
+        <button 
+          (click)="scanInterval.set(Math.min(300, scanInterval() + 30))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          +
+        </button>
+        <span class="text-sm font-semibold ml-2 text-skin-accent">
+          {{ scanInterval() }}s
+        </span>
+      </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Max Signals</h3>
+      <div class="flex items-center gap-2">
+        <button 
+          (click)="maxSignals.set(Math.max(10, maxSignals() - 5))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          -
+        </button>
+        <input
+          type="number"
+          min="10"
+          max="50"
+          step="5"
+          [value]="maxSignals()"
+          (input)="maxSignals.set(+($any($event.target).value))"
+          class="w-16 text-center bg-skin-panel border border-skin-muted rounded px-2 py-1 text-sm"
+        />
+        <button 
+          (click)="maxSignals.set(Math.min(50, maxSignals() + 5))"
+          class="px-2 py-1 bg-skin-muted/20 text-skin-muted hover:bg-skin-muted/30 rounded text-sm transition"
+        >
+          +
+        </button>
+        <span class="text-sm font-semibold ml-2 text-skin-accent">
+          {{ maxSignals() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Analysis Settings</h3>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            [checked]="adaptiveThresholds()"
+            (change)="adaptiveThresholds.set($any($event.target).checked)"
+          />
+          Adaptive Thresholds
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            [checked]="tickAnalysisEnabled()"
+            (change)="tickAnalysisEnabled.set($any($event.target).checked)"
+          />
+          Tick Analysis (1m)
+        </label>
+      </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Filters</h3>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            [checked]="filterByVolumeSpike()"
+            (change)="filterByVolumeSpike.set($any($event.target).checked)"
+          />
+          Volume Spike
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            [checked]="filterByBreakout()"
+            (change)="filterByBreakout.set($any($event.target).checked)"
+          />
+          Historical Moves
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            [checked]="filterByTickAnalysis()"
+            (change)="filterByTickAnalysis.set($any($event.target).checked)"
+          />
+          Tick Analysis
+        </label>
+      </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Signal Type</h3>
+      <div class="flex gap-2">
+        <button
+          class="px-3 py-1 rounded text-xs font-medium transition border"
+          [ngClass]="{
+            'bg-skin-accent text-skin-text border-skin-accent': filterBySignalType() === 'all',
+            'bg-skin-muted/20 text-skin-muted border-skin-muted': filterBySignalType() !== 'all'
+          }"
+          (click)="filterBySignalType.set('all')"
+        >
+          All Signals
+        </button>
+        <button
+          class="px-3 py-1 rounded text-xs font-medium transition border"
+          [ngClass]="{
+            'bg-green-500 text-white border-green-500': filterBySignalType() === 'bullish',
+            'bg-skin-muted/20 text-skin-muted border-skin-muted': filterBySignalType() !== 'bullish'
+          }"
+          (click)="filterBySignalType.set('bullish')"
+        >
+          🚀 Bullish
+        </button>
+        <button
+          class="px-3 py-1 rounded text-xs font-medium transition border"
+          [ngClass]="{
+            'bg-red-500 text-white border-red-500': filterBySignalType() === 'bearish',
+            'bg-skin-muted/20 text-skin-muted border-skin-muted': filterBySignalType() !== 'bearish'
+          }"
+          (click)="filterBySignalType.set('bearish')"
+        >
+          📉 Bearish
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-skin-panel p-4 rounded-lg">
+      <h3 class="text-sm font-semibold text-skin-muted mb-3">Sort By</h3>
+      <div class="grid grid-cols-2 gap-1">
+        <button
+          *ngFor="let field of ['confidence', 'volumeSpike', 'percentile', 'successRate', 'similarMoves', 'priceChange', 'volumePressure', 'tickFrequency', 'largeOrders', 'symbol']"
+          (click)="setSorting(field)"
+          class="px-2 py-1 rounded text-xs font-medium transition border text-left"
+          [ngClass]="{
+            'bg-skin-accent text-skin-text border-skin-accent': sortBy() === field,
+            'bg-skin-muted/20 text-skin-muted border-skin-muted hover:bg-skin-muted/30': sortBy() !== field
+          }"
+        >
+          <span class="text-xs mr-1">{{ getSortIcon(field) }}</span>
+          {{ getSortLabel(field) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="bg-skin-panel p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-green-500">{{ bullishSignals().length }}</div>
+      <div class="text-sm text-skin-muted">Bullish</div>
+    </div>
+    <div class="bg-skin-panel p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-red-500">{{ bearishSignals().length }}</div>
+      <div class="text-sm text-skin-muted">Bearish</div>
+    </div>
+    <div class="bg-skin-panel p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-skin-accent">{{ highConfidenceSignals().length }}</div>
+      <div class="text-sm text-skin-muted">High Confidence</div>
+    </div>
+    <div class="bg-skin-panel p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-blue-500">{{ tickSignals().length }}</div>
+      <div class="text-sm text-skin-muted">Tick Signals</div>
+    </div>
+    <div class="bg-skin-panel p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-skin-text">{{ alertSignals().length }}</div>
+      <div class="text-sm text-skin-muted">Alerts</div>
+    </div>
+  </div>
+
+  @if (lastScanTime()) {
+    <div class="text-sm text-skin-muted mb-4">
+      Last scan: {{ lastScanTime() | date:'HH:mm:ss' }} | 
+      Next scan in: {{ scanInterval() }}s
+    </div>
+  }
+
+  <div class="relative">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @for (signal of filteredSignals(); track signal.symbol + signal.timeframe + signal.timestamp.getTime()) {
+      <div class="rounded-xl shadow p-5 flex flex-col justify-between min-h-[320px] border-2"
+        [ngClass]="getSignalCardClass(signal.signalType)">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <div class="font-bold text-lg text-skin-primary">{{ signal.symbol }}</div>
+            <div class="text-xs text-skin-muted">{{ getTimeframeLabel(signal.timeframe) }}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">{{ getSignalIcon(signal) }}</span>
+            <span class="font-semibold text-base" [ngClass]="getSignalTypeColor(signal.signalType)">{{ signal.signalType }}</span>
+          </div>
+        </div>
+        <div class="space-y-1 mt-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-skin-muted">Change ({{ getTimeframeLabel(signal.timeframe) }})</span>
+            <span [ngClass]="{
+              'text-green-500': signal.changePercent > 0,
+              'text-red-500': signal.changePercent < 0,
+              'text-skin-muted': signal.changePercent === 0
+            }">
+              <span class="text-xs">{{ signal.changePercent > 0 ? '▲' : signal.changePercent < 0 ? '▼' : '→' }}</span>
+              {{ signal.changePercent > 0 ? '+' : '' }}{{ signal.changePercent | number:'1.2-2' }}%
+            </span>
+          </div>
+           @if (signal.timeframeData) {
+             <div class="text-xs text-skin-muted mt-1 space-y-1">
+               <div class="flex justify-between">
+                 <span>1m:</span>
+                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1M) }}</span>
+               </div>
+               <div class="flex justify-between">
+                 <span>5m:</span>
+                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF5M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF5M) }}</span>
+               </div>
+               <div class="flex justify-between">
+                 <span>15m:</span>
+                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF15M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF15M) }}</span>
+               </div>
+               <div class="flex justify-between">
+                 <span>1h:</span>
+                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1H) }}</span>
+               </div>
+               <div class="flex justify-between">
+                 <span>4h:</span>
+                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF4H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF4H) }}</span>
+               </div>
+             </div>
+           }
+          <div class="flex justify-between text-sm">
+            <span class="text-skin-muted">Volume</span>
+            <span class="text-xs" [ngClass]="{
+              'text-green-500': signal.volumeSpike > 3,
+              'text-yellow-500': signal.volumeSpike > 2 && signal.volumeSpike <= 3,
+              'text-skin-muted': signal.volumeSpike <= 2
+            }">{{ signal.volumeSpike | number:'1.1' }}x</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-skin-muted">Percentile</span>
+            <span class="text-xs font-semibold" [ngClass]="getPercentileColor(signal.thresholdPercentile)">{{ formatPercentile(signal.thresholdPercentile) }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-skin-muted">Confidence</span>
+            <span class="font-semibold" [ngClass]="getConfidenceColor(signal.confidence)">{{ signal.confidence }}%</span>
+          </div>
+          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+            <span class="text-skin-muted">Tick Freq</span>
+            <span class="text-xs text-skin-accent">{{ formatTickFrequency(signal.tickAnalysis.tickFrequency) }}</span>
+          </div>
+          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+            <span class="text-skin-muted">Orders</span>
+            <span class="text-xs" [ngClass]="{
+              'text-green-500': signal.tickAnalysis.largeOrders > 10,
+              'text-yellow-500': signal.tickAnalysis.largeOrders > 5 && signal.tickAnalysis.largeOrders <= 10,
+              'text-skin-muted': signal.tickAnalysis.largeOrders <= 5
+            }">{{ signal.tickAnalysis.largeOrders }}</span>
+          </div>
+          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+            <span class="text-skin-muted">Pressure</span>
+            <span class="flex items-center gap-1">
+              <span>{{ getVolumePressureIcon(signal.tickAnalysis.volumePressure) }}</span>
+              <span class="text-xs" [ngClass]="getVolumePressureColor(signal.tickAnalysis.volumePressure)">{{ (signal.tickAnalysis.volumePressure * 100) | number:'1.0' }}%</span>
+            </span>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-between items-end">
+          <div class="text-xs text-skin-muted max-w-[70%] truncate">{{ signal.description }}</div>
+          <a [href]="getTradingViewUrl(signal.symbol)" target="_blank" rel="noopener noreferrer" class="text-skin-muted hover:text-skin-accent transition-colors text-xl" title="Open TradingView chart">📈</a>
+        </div>
+      </div>
+    }
+    @if (isLoading()) {
+      <div class="col-span-full flex justify-center items-center py-8">
+        <div class="flex flex-col items-center">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-skin-accent mb-2"></div>
+          <div class="text-skin-muted">Loading signals...</div>
+        </div>
+      </div>
+    }
+    </div>
+  </div>
+
+  @for (signal of filteredSignals(); track signal.symbol + signal.timeframe + signal.timestamp.getTime()) {
+    @if (signal.description) {
+      <div class="mt-2 p-3 bg-skin-panel/80 rounded border border-skin-muted/20">
+        <div class="text-sm font-semibold mb-1" [ngClass]="getSignalTypeColor(signal.signalType)">
+          {{ signal.symbol }} - {{ signal.description }}
+        </div>
+        <div class="text-xs text-skin-muted">
+          Detected at {{ signal.timestamp | date:'HH:mm:ss' }} | 
+          {{ formatPercentile(signal.thresholdPercentile) }} percentile
+        </div>
+      </div>
+    }
+  }
+
+  @if (alertSignals().length > 0) {
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-skin-primary">🚨 High Confidence Alerts</h3>
+        <button
+          (click)="clearAlerts()"
+          class="px-3 py-1 text-xs bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition"
+        >
+          Clear All
+        </button>
+      </div>
+      
+      <div class="space-y-2">
+        @for (alert of alertSignals(); track alert.symbol + alert.timeframe + alert.timestamp.getTime()) {
+          <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-semibold text-red-500">{{ alert.symbol }}</span>
+                <span class="text-sm text-skin-muted ml-2">{{ getTimeframeLabel(alert.timeframe) }}</span>
+                <span class="text-sm ml-2" [ngClass]="getSignalTypeColor(alert.signalType)">
+                  {{ alert.signalType.toUpperCase() }}
+                </span>
+                <span class="text-sm ml-2" [ngClass]="getPercentileColor(alert.thresholdPercentile)">
+                  {{ formatPercentile(alert.thresholdPercentile) }}
+                </span>
+              </div>
+              <div class="text-sm text-skin-muted">
+                {{ alert.timestamp | date:'HH:mm:ss' }}
+              </div>
+            </div>
+            <div class="text-sm text-skin-text mt-1">{{ alert.description }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div> 

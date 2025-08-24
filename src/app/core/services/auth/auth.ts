@@ -4,20 +4,20 @@ import { AuthStore } from '../../store/auth.store';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Auth {
   private http = inject(HttpClient);
   private authStore = inject(AuthStore);
 
-  login(apiKey: string): void {
-    this.http.post<{ access_token: string }>(
-      `${environment.apiBaseUrl}/auth/token`,
-      {},
-      { headers: { 'x-api-key': apiKey } }
-    ).subscribe(response => {
-      this.authStore.setToken(response.access_token, 'frontend-angular-app');
-    });
+  login(): void {
+    this.http
+      .post<{
+        access_token: string;
+      }>(`${environment.apiBaseUrl}/auth/token`, {}, { headers: { 'x-api-key': environment.frontendApiKey } })
+      .subscribe((response) => {
+        this.authStore.setToken(response.access_token, 'frontend-angular-app');
+      });
   }
 
   logout(): void {

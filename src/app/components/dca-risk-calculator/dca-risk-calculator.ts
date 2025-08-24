@@ -21,7 +21,6 @@ export interface DCALevel {
   styleUrl: './dca-risk-calculator.scss',
 })
 export class DcaRiskCalculator {
-  // Input parameters
   entryPrice = signal<number>(50000);
   balance = signal<number>(10000);
   riskPercent = signal<number>(5);
@@ -31,7 +30,6 @@ export class DcaRiskCalculator {
   growLeverage = signal<boolean>(false);
   targetSellPrice = signal<number>(60000);
 
-  // Computed values
   totalRiskAmount = computed(() => (this.balance() * this.riskPercent()) / 100);
 
   dcaLevels = computed(() => {
@@ -44,31 +42,25 @@ export class DcaRiskCalculator {
     const shouldGrowLeverage = this.growLeverage();
     const targetPrice = this.targetSellPrice();
 
-    // Calculate position size increase factor (larger positions at lower prices)
-    const positionIncreaseFactor = 1.5; // Each level gets 50% larger position
+    const positionIncreaseFactor = 1.5;
 
     for (let i = 0; i < levelsCount; i++) {
       const level = i + 1;
       const pullbackPercent = (pullback * i) / (levelsCount - 1);
       const entryPrice = basePrice * (1 - pullbackPercent);
 
-      // Calculate leverage for this level
       let levelLeverage = baseLeverage;
       if (shouldGrowLeverage) {
-        // Exponential leverage growth: 2x → 3x → 5x → 8x → 12x
         levelLeverage = Math.round(baseLeverage * Math.pow(1.5, i));
       }
 
-      // Position size increases with each level (more aggressive at lower prices)
       const positionSizeMultiplier = Math.pow(positionIncreaseFactor, i);
       const basePositionSize = totalRisk / levelsCount;
       const positionSize = basePositionSize * positionSizeMultiplier;
 
-      // Risk per level (increases with position size and leverage)
       const riskAmount = positionSize / levelLeverage;
       const cumulativeRisk = levels.reduce((sum, l) => sum + l.riskAmount, 0) + riskAmount;
 
-      // Calculate profit for this level
       const priceDifference = targetPrice - entryPrice;
       const profitPercent = (priceDifference / entryPrice) * 100;
       const profitIfTargetHit = (positionSize * priceDifference) / entryPrice;

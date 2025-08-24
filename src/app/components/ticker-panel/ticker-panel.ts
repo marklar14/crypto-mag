@@ -1,6 +1,6 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject } from '@angular/core';
 import { TickerStore } from '../../core/store/ticker.store';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { TickerCardSkeleton } from '../ticker-card-skeleton/ticker-card-skeleton';
 
 @Component({

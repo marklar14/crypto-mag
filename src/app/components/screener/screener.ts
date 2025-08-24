@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
+import { Component, inject, OnInit, computed, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScreenerStore } from '../../core/store/screener.store';
 import { ScreenerService } from '../../core/services/screener/screener';
@@ -14,7 +14,7 @@ import { ScreenerSetupResponse } from '../../core/models/api/screener-setup';
   templateUrl: './screener.html',
   styleUrl: './screener.scss',
 })
-export class Screener implements OnInit {
+export class Screener implements OnInit, OnDestroy {
   private store = inject(ScreenerStore);
   private screener = inject(ScreenerService);
   readonly Array = Array;
@@ -23,10 +23,13 @@ export class Screener implements OnInit {
   screenResults = this.store.results;
   pagination = this.store.pagination;
 
-  // Current timeframe selection
-  selectedTimeframe = 'tf1h'; // Default to 1h
+  selectedTimeframe = 'tf1h';
   currentPage = 1;
   itemsPerPage = 20;
+
+  public autoRefreshEnabled = signal<boolean>(false);
+  public autoRefreshInterval = signal<number>(60);
+  private autoRefreshTimer?: any;
 
   public sortBy = signal<string>('symbol');
   public sortOrder = signal<'asc' | 'desc'>('asc');
@@ -36,7 +39,6 @@ export class Screener implements OnInit {
   public selectedSignalType = signal<string | null>(null);
   public selectedMarketCap = signal<string | null>(null);
 
-  // Market cap filter options
   public marketCapRanges = [
     { value: '', label: 'All Market Caps' },
     { value: 'mega', label: 'Mega Cap (>$10B)', min: 10000000000 },
@@ -44,6 +46,14 @@ export class Screener implements OnInit {
     { value: 'mid', label: 'Mid Cap ($100M-$1B)', min: 100000000, max: 999999999 },
     { value: 'small', label: 'Small Cap ($10M-$100M)', min: 10000000, max: 99999999 },
     { value: 'micro', label: 'Micro Cap (<$10M)', max: 9999999 },
+  ];
+
+  public refreshIntervalOptions = [
+    { value: 30, label: '30s' },
+    { value: 60, label: '1m' },
+    { value: 120, label: '2m' },
+    { value: 300, label: '5m' },
+    { value: 600, label: '10m' },
   ];
 
   sortResults<T extends { [key: string]: any }>(results: T[]): T[] {
@@ -62,7 +72,6 @@ export class Screener implements OnInit {
     });
   }
 
-  // Computed properties for different timeframes
   tf5mResults = computed(() =>
     this.sortResults(
       this.screenResults()
@@ -193,6 +202,10 @@ export class Screener implements OnInit {
     this.loadScreenerData();
   }
 
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
+  }
+
   loadScreenerData(): void {
     this.store.setLoading(true);
     const params: ScreenerParams = {
@@ -214,7 +227,7 @@ export class Screener implements OnInit {
 
   setTimeframe(timeframe: string): void {
     this.selectedTimeframe = timeframe;
-    this.currentPage = 1; // Reset to first page when changing timeframe
+    this.currentPage = 1;
     this.loadScreenerData();
   }
 
@@ -346,5 +359,45 @@ export class Screener implements OnInit {
       ...current,
       [symbol]: !current[symbol],
     });
+  }
+
+  private startAutoRefresh(): void {
+    if (this.autoRefreshEnabled()) {
+      this.stopAutoRefresh();
+      this.autoRefreshTimer = setInterval(() => {
+        this.loadScreenerData();
+      }, this.autoRefreshInterval() * 1000);
+    }
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = undefined;
+    }
+  }
+
+  public toggleAutoRefresh(): void {
+    this.autoRefreshEnabled.set(!this.autoRefreshEnabled());
+    if (this.autoRefreshEnabled()) {
+      this.startAutoRefresh();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
+  public updateAutoRefreshInterval(interval: number): void {
+    this.autoRefreshInterval.set(interval);
+    if (this.autoRefreshEnabled()) {
+      this.startAutoRefresh();
+    }
+  }
+
+  public getNextRefreshTime(): string {
+    if (!this.autoRefreshEnabled()) return 'Disabled';
+
+    const now = new Date();
+    const nextRefresh = new Date(now.getTime() + this.autoRefreshInterval() * 1000);
+    return nextRefresh.toLocaleTimeString();
   }
 }
