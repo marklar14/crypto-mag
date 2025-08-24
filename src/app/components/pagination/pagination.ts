@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'mag-pagination',
-  standalone: true,
   imports: [CommonModule],
   template: `
     <div class="flex items-center justify-between mt-4">
@@ -95,28 +94,23 @@ export class Pagination {
     const pages: (number | string)[] = [];
 
     if (total <= 7) {
-      // Show all pages if total is small
       for (let i = 1; i <= total; i++) {
         pages.push(i);
       }
     } else {
-      // Show smart pagination
       if (current <= 4) {
-        // Near start
         for (let i = 1; i <= 5; i++) {
           pages.push(i);
         }
         pages.push('...');
         pages.push(total);
       } else if (current >= total - 3) {
-        // Near end
         pages.push(1);
         pages.push('...');
         for (let i = total - 4; i <= total; i++) {
           pages.push(i);
         }
       } else {
-        // Middle
         pages.push(1);
         pages.push('...');
         for (let i = current - 1; i <= current + 1; i++) {

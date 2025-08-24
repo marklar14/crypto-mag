@@ -51,10 +51,8 @@
             ></div>
           </div>
 
-          <!-- Trend SVG top right, 2x bigger, but arrow smaller -->
           <div class="absolute right-16 top-20 pointer-events-none select-none opacity-90">
             @if (ticker.price24hPcnt > 0) {
-              <!-- Bullish: up arrow, green -->
               <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-success">
                 <defs>
                   <marker id="arrow-up" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
@@ -64,7 +62,6 @@
                 <polyline points="8,36 48,12 80,20 88,8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-up)" />
               </svg>
             } @else if (ticker.price24hPcnt < 0) {
-              <!-- Bearish: down arrow, red -->
               <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-danger">
                 <defs>
                   <marker id="arrow-down" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
@@ -74,7 +71,6 @@
                 <polyline points="8,8 48,28 80,20 88,32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-down)" />
               </svg>
             } @else {
-              <!-- Neutral: flat line, muted -->
               <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-muted">
                 <line x1="12" y1="20" x2="84" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
                 <circle cx="84" cy="20" r="3" fill="currentColor"/>

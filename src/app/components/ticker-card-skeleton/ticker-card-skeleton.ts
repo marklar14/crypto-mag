@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'mag-ticker-card-skeleton',
-  standalone: true,
   imports: [CommonModule],
   template: `
     <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">

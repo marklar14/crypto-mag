@@ -5,11 +5,20 @@ import { ProfitTargetCalculator } from '../../components/profit-target-calculato
 import { Screener } from '../../components/screener/screener';
 import { TickerPanel } from '../../components/ticker-panel/ticker-panel';
 import { DcaRiskCalculator } from '../../components/dca-risk-calculator/dca-risk-calculator';
+import { RealTimeScanner } from '../../components/real-time-scanner/real-time-scanner';
 
 @Component({
   selector: 'mag-dashboard',
   standalone: true,
-  imports: [Header, Logo, TickerPanel, ProfitTargetCalculator, Screener, DcaRiskCalculator],
+  imports: [
+    Header,
+    Logo,
+    TickerPanel,
+    ProfitTargetCalculator,
+    Screener,
+    DcaRiskCalculator,
+    RealTimeScanner,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
