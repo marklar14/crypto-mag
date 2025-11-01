@@ -7,7 +7,6 @@ import { AuthStore } from './core/store/auth.store';
 @Component({
   selector: 'mag-root',
   imports: [Dashboard],
-  standalone: true,
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

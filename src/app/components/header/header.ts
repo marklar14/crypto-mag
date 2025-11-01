@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'mag-header',
@@ -6,5 +6,5 @@ import { Component, Input } from '@angular/core';
   styleUrl: './header.scss',
 })
 export class Header {
-  @Input() title = 'Welcome';
+  title = input<string>('Welcome');
 }

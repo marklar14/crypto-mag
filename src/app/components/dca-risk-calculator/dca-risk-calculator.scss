@@ -1,11 +1,7 @@
-// DCA Risk Calculator styles
-// Most styling is handled by Tailwind classes, this file is for any custom styles
-
 :host {
   display: block;
 }
 
-// Custom scrollbar for table
 .overflow-x-auto {
   &::-webkit-scrollbar {
     height: 6px;
@@ -26,7 +22,6 @@
   }
 }
 
-// Table hover effects
 table tbody tr {
   transition: all 0.2s ease;
   
@@ -36,13 +31,11 @@ table tbody tr {
   }
 }
 
-// Input focus effects
 input:focus {
   transform: scale(1.02);
   transition: transform 0.2s ease;
 }
 
-// Button hover effects
 button {
   transition: all 0.2s ease;
   

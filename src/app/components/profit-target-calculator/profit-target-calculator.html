@@ -48,46 +48,46 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase mb-2">Risk Settings</h3>
-        <p>💥 <strong>Planned Risk:</strong> {{ riskAmount | currency:'USD':'symbol' }}</p>
-        <p>📉 <strong>Stop Loss Price:</strong> {{ stopLossPrice.toFixed(4) }}</p>
-        <p>📏 <strong>SL Distance:</strong> {{ slDistance.toFixed(4) }}</p>
+        <p>💥 <strong>Planned Risk:</strong> {{ riskAmount() | currency:'USD':'symbol' }}</p>
+        <p>📉 <strong>Stop Loss Price:</strong> {{ stopLossPrice().toFixed(4) }}</p>
+        <p>📏 <strong>SL Distance:</strong> {{ slDistance().toFixed(4) }}</p>
       </div>
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase mb-2">Position Details</h3>
-        <p>📦 <strong>Position Size:</strong> {{ positionSize | number:'1.0-2' }} units</p>
-        <p>💰 <strong>Notional Value:</strong> {{ notionalValue | currency:'USD':'symbol' }}</p>
-        <p>💵 <strong>USDT Required:</strong> {{ usdtRequired | currency:'USD':'symbol' }}</p>
-        <p>📊 <strong>Lots:</strong> {{ lots.toFixed(2) }}</p>
+        <p>📦 <strong>Position Size:</strong> {{ positionSize() | number:'1.0-2' }} units</p>
+        <p>💰 <strong>Notional Value:</strong> {{ notionalValue() | currency:'USD':'symbol' }}</p>
+        <p>💵 <strong>USDT Required:</strong> {{ usdtRequired() | currency:'USD':'symbol' }}</p>
+        <p>📊 <strong>Lots:</strong> {{ lots().toFixed(2) }}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Target</h3>
-        <p>🎯 <strong>Target Profit:</strong> {{ targetProfit | currency:'USD':'symbol' }} ({{ targetProfitPercent | number:'1.0-2' }}%)</p>
+        <p>🎯 <strong>Target Profit:</strong> {{ targetProfit() | currency:'USD':'symbol' }} ({{ targetProfitPercent() | number:'1.0-2' }}%)</p>
       </div>
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Stop Loss</h3>
-        <p>🛑 <strong>SL Loss (Real):</strong> {{ slLoss | currency:'USD':'symbol' }} ({{ slLossPercent | number:'1.0-2' }}%)</p>
+        <p>🛑 <strong>SL Loss (Real):</strong> {{ slLoss() | currency:'USD':'symbol' }} ({{ slLossPercent() | number:'1.0-2' }}%)</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Risk / Reward</h3>
-        <p>🏛️ <strong>R/R Ratio:</strong> {{ rrRatio.toFixed(2) }}</p>
+        <p>🏛️ <strong>R/R Ratio:</strong> {{ rrRatio().toFixed(2) }}</p>
       </div>
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Fees</h3>
-        <p>💸 <strong>Fees (Real):</strong> {{ realFeeUsd | currency:'USD':'symbol' }} ({{ realFeePercent | number:'1.0-2' }}%)</p>
+        <p>💸 <strong>Fees (Real):</strong> {{ realFeeUsd() | currency:'USD':'symbol' }} ({{ realFeePercent() | number:'1.0-2' }}%)</p>
       </div>
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Break-even</h3>
-        <p>⚖️ <strong>Price 0 Profit:</strong> {{ breakEvenPrice.toFixed(4) }}</p>
+        <p>⚖️ <strong>Price 0 Profit:</strong> {{ breakEvenPrice().toFixed(4) }}</p>
       </div>
       <div>
         <h3 class="text-slate-400 font-semibold text-xs uppercase">Liquidation</h3>
-        <p>💣 <strong>Liquidation Price:</strong> {{ liquidationPrice.toFixed(4) }}</p>
+        <p>💣 <strong>Liquidation Price:</strong> {{ liquidationPrice().toFixed(4) }}</p>
       </div>
     </div>
   </div>

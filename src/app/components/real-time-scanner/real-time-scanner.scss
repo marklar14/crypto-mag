@@ -4,7 +4,6 @@
   height: 100%;
 }
 
-// Custom range slider styling
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -52,7 +51,6 @@ input[type="range"] {
   }
 }
 
-// Animation for scanning indicator
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -66,7 +64,6 @@ input[type="range"] {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-// Signal strength indicators
 .signal-strong {
   border-left: 4px solid #10b981;
 }
@@ -79,7 +76,6 @@ input[type="range"] {
   border-left: 4px solid #6b7280;
 }
 
-// Hover effects for signal rows
 .signal-row {
   transition: all 0.2s ease-in-out;
   
@@ -89,7 +85,6 @@ input[type="range"] {
   }
 }
 
-// Alert animations
 @keyframes alertPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
@@ -106,7 +101,6 @@ input[type="range"] {
   animation: alertPulse 2s infinite;
 }
 
-// Responsive grid adjustments
 @media (max-width: 768px) {
   .grid-cols-12 {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -121,7 +115,6 @@ input[type="range"] {
   }
 }
 
-// Custom scrollbar for the signals table
 .signals-table {
   &::-webkit-scrollbar {
     width: 6px;
@@ -141,7 +134,6 @@ input[type="range"] {
   }
 }
 
-// Loading skeleton animation
 @keyframes shimmer {
   0% {
     background-position: -200px 0;
@@ -157,7 +149,6 @@ input[type="range"] {
   animation: shimmer 1.5s infinite;
 }
 
-// Confidence level colors
 .confidence-high {
   color: #10b981;
 }
@@ -170,7 +161,6 @@ input[type="range"] {
   color: #ef4444;
 }
 
-// Volume spike indicators
 .volume-high {
   color: #10b981;
   font-weight: bold;
@@ -184,7 +174,6 @@ input[type="range"] {
   color: var(--skin-muted);
 }
 
-// Breakout indicators
 .breakout-bullish {
   background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
 }
@@ -193,7 +182,6 @@ input[type="range"] {
   background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
 }
 
-// Timeframe badges
 .timeframe-badge {
   padding: 2px 6px;
   border-radius: 4px;
@@ -217,13 +205,11 @@ input[type="range"] {
   }
 }
 
-// Signal type icons
 .signal-icon {
   font-size: 14px;
   margin-right: 4px;
 }
 
-// Chart link hover effect
 .chart-link {
   transition: all 0.2s ease;
   
@@ -233,7 +219,6 @@ input[type="range"] {
   }
 }
 
-// Notification button states
 .notification-btn {
   &.enabled {
     background: rgba(16, 185, 129, 0.2);
@@ -246,7 +231,6 @@ input[type="range"] {
   }
 }
 
-// Real-time updates indicator
 .real-time-indicator {
   position: relative;
   
