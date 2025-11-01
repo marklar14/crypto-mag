@@ -35,6 +35,7 @@ export class RealTimeScanner implements OnDestroy {
   public filterByTickAnalysis = this.facade.filterByTickAnalysis;
   public sortBy = this.facade.sortBy;
   public sortOrder = this.facade.sortOrder;
+  public realTimeSignals = this.facade.realTimeSignals;
   public filteredSignals = this.facade.filteredSignals;
   public highConfidenceSignals = this.facade.highConfidenceSignals;
   public bullishSignals = this.facade.bullishSignals;

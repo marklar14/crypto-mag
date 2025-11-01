@@ -1,84 +1,146 @@
 <div class="bg-skin-panel-gradient rounded-2xl p-6 shadow-lg">
-  <div
-    class="grid gap-4"
-    style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))"
-  >
-    @if (isLoading()) {
-      <mag-ticker-card-skeleton [count]="4" />
-    } @else {
-    @for (ticker of tickerList(); track ticker.symbol) {
-        <div class="bg-skin-panel rounded-xl p-4 shadow-sm text-sm flex flex-col relative">
-          <div class="flex justify-between items-start mb-1">
-            <span class="text-skin-primary font-semibold">{{ ticker.symbol }}</span>
-            <span class="text-skin-muted text-xs">
-              Vol: {{ ticker.volume24h | number: '1.0-0' }}
-            </span>
-          </div>
+  <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+    @if (isLoading() && tickerList().length === 0) {
+    <mag-ticker-card-skeleton [count]="4" />
+    } @else if (!isLoading() && tickerList().length === 0) {
+    <div class="flex justify-center items-center py-12 w-full" style="grid-column: 1 / -1">
+      <div class="flex flex-col items-center text-center">
+        <div class="text-6xl mb-4 opacity-50">📊</div>
+        <div class="text-xl font-semibold text-skin-primary mb-2">No Data Available</div>
+        <div class="text-sm text-skin-muted max-w-md">
+          Unable to load ticker data. Please check your connection or try again later.
+        </div>
+      </div>
+    </div>
+    } @else { @for (ticker of tickerList(); track ticker.symbol) {
+    <div class="bg-skin-panel rounded-xl p-4 shadow-sm text-sm flex flex-col relative">
+      <div class="flex justify-between items-start mb-1">
+        <span class="text-skin-primary font-semibold">{{ ticker.symbol }}</span>
+        <span class="text-skin-muted text-xs"> Vol: {{ ticker.volume24h | number: '1.0-0' }} </span>
+      </div>
 
-          <div class="text-xl font-bold text-skin-text">
-            ${{ ticker.lastPrice | number: '1.2-2' }}
-            <span
-              class="ml-2 text-base font-medium"
-              [ngClass]="{
+      <div class="text-xl font-bold text-skin-text">
+        ${{ ticker.lastPrice | number: '1.2-2' }}
+        <span
+          class="ml-2 text-base font-medium"
+          [ngClass]="{
                 'text-skin-success': ticker.price24hPcnt >= 0,
                 'text-skin-danger': ticker.price24hPcnt < 0
               }"
-            >
-              {{ (ticker.price24hPcnt * 100) | number: '1.2-2' }}%
-              @if (ticker.previousPrice) {
-                <span class="text-xs font-normal">
-                  ({{ ticker.previousPrice | number: '1.2-2' }} → {{ ticker.lastPrice | number: '1.2-2' }})
-                </span>
-              }
-            </span>
-          </div>
+        >
+          {{ (ticker.price24hPcnt * 100) | number: '1.2-2' }}% @if (ticker.previousPrice) {
+          <span class="text-xs font-normal">
+            ({{ ticker.previousPrice | number: '1.2-2' }} → {{ ticker.lastPrice | number: '1.2-2'
+            }})
+          </span>
+          }
+        </span>
+      </div>
 
-          <div class="mt-2 text-xs text-skin-muted space-y-1">
-            <div>Mark: ${{ ticker.markPrice | number: '1.2-2' }}</div>
-            <div>High 24h: ${{ ticker.highPrice24h | number: '1.2-2' }}</div>
-            <div>Low 24h: ${{ ticker.lowPrice24h | number: '1.2-2' }}</div>
-            <div>OI: {{ ticker.openInterest | number: '1.0-0' }}</div>
-          </div>
+      <div class="mt-2 text-xs text-skin-muted space-y-1">
+        <div>Mark: ${{ ticker.markPrice | number: '1.2-2' }}</div>
+        <div>High 24h: ${{ ticker.highPrice24h | number: '1.2-2' }}</div>
+        <div>Low 24h: ${{ ticker.lowPrice24h | number: '1.2-2' }}</div>
+        <div>OI: {{ ticker.openInterest | number: '1.0-0' }}</div>
+      </div>
 
-          <div class="relative w-full h-1 bg-skin-muted/10 rounded mt-2 overflow-hidden">
-            <div
-              class="absolute h-full bg-skin-accent rounded transition-all duration-300"
-              [style.width.%]="
+      <div class="relative w-full h-1 bg-skin-muted/10 rounded mt-2 overflow-hidden">
+        <div
+          class="absolute h-full bg-skin-accent rounded transition-all duration-300"
+          [style.width.%]="
                 ((ticker.lastPrice - ticker.lowPrice24h) /
                   (ticker.highPrice24h - ticker.lowPrice24h)) *
                 100
               "
-            ></div>
-          </div>
+        ></div>
+      </div>
 
-          <div class="absolute right-16 top-20 pointer-events-none select-none opacity-90">
-            @if (ticker.price24hPcnt > 0) {
-              <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-success">
-                <defs>
-                  <marker id="arrow-up" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,4 L2,2 L0,0" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                  </marker>
-                </defs>
-                <polyline points="8,36 48,12 80,20 88,8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-up)" />
-              </svg>
-            } @else if (ticker.price24hPcnt < 0) {
-              <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-danger">
-                <defs>
-                  <marker id="arrow-down" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L2,2 L0,4" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                  </marker>
-                </defs>
-                <polyline points="8,8 48,28 80,20 88,32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-down)" />
-              </svg>
-            } @else {
-              <svg width="96" height="40" viewBox="0 0 96 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-skin-muted">
-                <line x1="12" y1="20" x2="84" y2="20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                <circle cx="84" cy="20" r="3" fill="currentColor"/>
-              </svg>
-            }
-          </div>
-        </div>
-      }
-    }
+      <div class="absolute right-16 top-20 pointer-events-none select-none opacity-90">
+        @if (ticker.price24hPcnt > 0) {
+        <svg
+          width="96"
+          height="40"
+          viewBox="0 0 96 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="text-skin-success"
+        >
+          <defs>
+            <marker
+              id="arrow-up"
+              markerWidth="4"
+              markerHeight="4"
+              refX="2"
+              refY="2"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <path d="M0,4 L2,2 L0,0" fill="none" stroke="currentColor" stroke-width="1.2" />
+            </marker>
+          </defs>
+          <polyline
+            points="8,36 48,12 80,20 88,8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            marker-end="url(#arrow-up)"
+          />
+        </svg>
+        } @else if (ticker.price24hPcnt < 0) {
+        <svg
+          width="96"
+          height="40"
+          viewBox="0 0 96 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="text-skin-danger"
+        >
+          <defs>
+            <marker
+              id="arrow-down"
+              markerWidth="4"
+              markerHeight="4"
+              refX="2"
+              refY="2"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <path d="M0,0 L2,2 L0,4" fill="none" stroke="currentColor" stroke-width="1.2" />
+            </marker>
+          </defs>
+          <polyline
+            points="8,8 48,28 80,20 88,32"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+            marker-end="url(#arrow-down)"
+          />
+        </svg>
+        } @else {
+        <svg
+          width="96"
+          height="40"
+          viewBox="0 0 96 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          class="text-skin-muted"
+        >
+          <line
+            x1="12"
+            y1="20"
+            x2="84"
+            y2="20"
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <circle cx="84" cy="20" r="3" fill="currentColor" />
+        </svg>
+        }
+      </div>
+    </div>
+    } }
   </div>
 </div>

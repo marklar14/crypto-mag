@@ -133,13 +133,13 @@ export class RealTimeScannerFacadeService {
         },
         error: (error) => {
           console.error('Error fetching real-time signals:', error);
-          this.setMockSignals();
+          this.realTimeSignals.set([]);
           this.isLoading.set(false);
         },
       });
     } catch (error) {
       console.error('Error during real-time scan:', error);
-      this.setMockSignals();
+      this.realTimeSignals.set([]);
       this.isLoading.set(false);
     }
   }
@@ -168,64 +168,6 @@ export class RealTimeScannerFacadeService {
 
   clearAlerts(): void {
     this.alertSignals.set([]);
-  }
-
-  private setMockSignals(): void {
-    const mockSignals: RealTimeSignal[] = [
-      {
-        symbol: 'BTCUSDT',
-        timeframe: 'tf1m',
-        signalType: 'bullish',
-        signalStrength: 'strong',
-        changePercent: 0.8,
-        volumeSpike: 3.2,
-        thresholdPercentile: 92,
-        timeframeData: {
-          tf1m: { priceChange: 0.8, volumeChange: 2.1 },
-          tf5m: { priceChange: 1.2, volumeChange: 1.8 },
-          tf15m: { priceChange: 2.5, volumeChange: 1.5 },
-          tf1h: { priceChange: 3.8, volumeChange: 1.2 },
-          tf4h: { priceChange: 5.2, volumeChange: 0.9 },
-        },
-        tickAnalysis: {
-          priceMomentum: 0.7,
-          volumePressure: 0.6,
-          tickFrequency: 8.5,
-          largeOrders: 12,
-        },
-        description: 'Strong buy pressure with large orders, 92nd percentile move',
-        timestamp: new Date(),
-        confidence: 85,
-      },
-      {
-        symbol: 'ETHUSDT',
-        timeframe: 'tf5m',
-        signalType: 'bearish',
-        signalStrength: 'medium',
-        changePercent: -1.2,
-        volumeSpike: 2.8,
-        thresholdPercentile: 87,
-        timeframeData: {
-          tf1m: { priceChange: -0.3, volumeChange: 1.8 },
-          tf5m: { priceChange: -1.2, volumeChange: 2.8 },
-          tf15m: { priceChange: -2.1, volumeChange: 2.2 },
-          tf1h: { priceChange: -3.5, volumeChange: 1.9 },
-          tf4h: { priceChange: -4.8, volumeChange: 1.6 },
-        },
-        tickAnalysis: {
-          priceMomentum: -0.5,
-          volumePressure: -0.4,
-          tickFrequency: 6.2,
-          largeOrders: 8,
-        },
-        description: 'Moderate sell pressure, 87th percentile move',
-        timestamp: new Date(),
-        confidence: 72,
-      },
-    ];
-
-    this.realTimeSignals.set(mockSignals);
-    this.checkForAlerts(mockSignals);
   }
 
   private checkForAlerts(newSignals: RealTimeSignal[]): void {
