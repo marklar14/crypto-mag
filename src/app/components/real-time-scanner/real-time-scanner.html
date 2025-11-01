@@ -254,28 +254,30 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="bg-skin-panel p-4 rounded-lg text-center">
-      <div class="text-2xl font-bold text-green-500">{{ bullishSignals().length }}</div>
-      <div class="text-sm text-skin-muted">Bullish</div>
+  @if (realTimeSignals().length > 0) {
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="bg-skin-panel p-4 rounded-lg text-center">
+        <div class="text-2xl font-bold text-green-500">{{ bullishSignals().length }}</div>
+        <div class="text-sm text-skin-muted">Bullish</div>
+      </div>
+      <div class="bg-skin-panel p-4 rounded-lg text-center">
+        <div class="text-2xl font-bold text-red-500">{{ bearishSignals().length }}</div>
+        <div class="text-sm text-skin-muted">Bearish</div>
+      </div>
+      <div class="bg-skin-panel p-4 rounded-lg text-center">
+        <div class="text-2xl font-bold text-skin-accent">{{ highConfidenceSignals().length }}</div>
+        <div class="text-sm text-skin-muted">High Confidence</div>
+      </div>
+      <div class="bg-skin-panel p-4 rounded-lg text-center">
+        <div class="text-2xl font-bold text-blue-500">{{ tickSignals().length }}</div>
+        <div class="text-sm text-skin-muted">Tick Signals</div>
+      </div>
+      <div class="bg-skin-panel p-4 rounded-lg text-center">
+        <div class="text-2xl font-bold text-skin-text">{{ alertSignals().length }}</div>
+        <div class="text-sm text-skin-muted">Alerts</div>
+      </div>
     </div>
-    <div class="bg-skin-panel p-4 rounded-lg text-center">
-      <div class="text-2xl font-bold text-red-500">{{ bearishSignals().length }}</div>
-      <div class="text-sm text-skin-muted">Bearish</div>
-    </div>
-    <div class="bg-skin-panel p-4 rounded-lg text-center">
-      <div class="text-2xl font-bold text-skin-accent">{{ highConfidenceSignals().length }}</div>
-      <div class="text-sm text-skin-muted">High Confidence</div>
-    </div>
-    <div class="bg-skin-panel p-4 rounded-lg text-center">
-      <div class="text-2xl font-bold text-blue-500">{{ tickSignals().length }}</div>
-      <div class="text-sm text-skin-muted">Tick Signals</div>
-    </div>
-    <div class="bg-skin-panel p-4 rounded-lg text-center">
-      <div class="text-2xl font-bold text-skin-text">{{ alertSignals().length }}</div>
-      <div class="text-sm text-skin-muted">Alerts</div>
-    </div>
-  </div>
+  }
 
   @if (lastScanTime()) {
     <div class="text-sm text-skin-muted mb-4">
@@ -286,97 +288,6 @@
 
   <div class="relative">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @for (signal of filteredSignals(); track signal.symbol + signal.timeframe + signal.timestamp.getTime()) {
-      <div class="rounded-xl shadow p-5 flex flex-col justify-between min-h-[320px] border-2"
-        [ngClass]="getSignalCardClass(signal.signalType)">
-        <div class="flex items-center justify-between mb-2">
-          <div>
-            <div class="font-bold text-lg text-skin-primary">{{ signal.symbol }}</div>
-            <div class="text-xs text-skin-muted">{{ getTimeframeLabel(signal.timeframe) }}</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">{{ getSignalIcon(signal) }}</span>
-            <span class="font-semibold text-base" [ngClass]="getSignalTypeColor(signal.signalType)">{{ signal.signalType }}</span>
-          </div>
-        </div>
-        <div class="space-y-1 mt-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-skin-muted">Change ({{ getTimeframeLabel(signal.timeframe) }})</span>
-            <span [ngClass]="{
-              'text-green-500': signal.changePercent > 0,
-              'text-red-500': signal.changePercent < 0,
-              'text-skin-muted': signal.changePercent === 0
-            }">
-              <span class="text-xs">{{ signal.changePercent > 0 ? '▲' : signal.changePercent < 0 ? '▼' : '→' }}</span>
-              {{ signal.changePercent > 0 ? '+' : '' }}{{ signal.changePercent | number:'1.2-2' }}%
-            </span>
-          </div>
-           @if (signal.timeframeData) {
-             <div class="text-xs text-skin-muted mt-1 space-y-1">
-               <div class="flex justify-between">
-                 <span>1m:</span>
-                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1M) }}</span>
-               </div>
-               <div class="flex justify-between">
-                 <span>5m:</span>
-                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF5M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF5M) }}</span>
-               </div>
-               <div class="flex justify-between">
-                 <span>15m:</span>
-                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF15M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF15M) }}</span>
-               </div>
-               <div class="flex justify-between">
-                 <span>1h:</span>
-                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1H) }}</span>
-               </div>
-               <div class="flex justify-between">
-                 <span>4h:</span>
-                 <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF4H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF4H) }}</span>
-               </div>
-             </div>
-           }
-          <div class="flex justify-between text-sm">
-            <span class="text-skin-muted">Volume</span>
-            <span class="text-xs" [ngClass]="{
-              'text-green-500': signal.volumeSpike > 3,
-              'text-yellow-500': signal.volumeSpike > 2 && signal.volumeSpike <= 3,
-              'text-skin-muted': signal.volumeSpike <= 2
-            }">{{ signal.volumeSpike | number:'1.1' }}x</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-skin-muted">Percentile</span>
-            <span class="text-xs font-semibold" [ngClass]="getPercentileColor(signal.thresholdPercentile)">{{ formatPercentile(signal.thresholdPercentile) }}</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-skin-muted">Confidence</span>
-            <span class="font-semibold" [ngClass]="getConfidenceColor(signal.confidence)">{{ signal.confidence }}%</span>
-          </div>
-          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
-            <span class="text-skin-muted">Tick Freq</span>
-            <span class="text-xs text-skin-accent">{{ formatTickFrequency(signal.tickAnalysis.tickFrequency) }}</span>
-          </div>
-          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
-            <span class="text-skin-muted">Orders</span>
-            <span class="text-xs" [ngClass]="{
-              'text-green-500': signal.tickAnalysis.largeOrders > 10,
-              'text-yellow-500': signal.tickAnalysis.largeOrders > 5 && signal.tickAnalysis.largeOrders <= 10,
-              'text-skin-muted': signal.tickAnalysis.largeOrders <= 5
-            }">{{ signal.tickAnalysis.largeOrders }}</span>
-          </div>
-          <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
-            <span class="text-skin-muted">Pressure</span>
-            <span class="flex items-center gap-1">
-              <span>{{ getVolumePressureIcon(signal.tickAnalysis.volumePressure) }}</span>
-              <span class="text-xs" [ngClass]="getVolumePressureColor(signal.tickAnalysis.volumePressure)">{{ (signal.tickAnalysis.volumePressure * 100) | number:'1.0' }}%</span>
-            </span>
-          </div>
-        </div>
-        <div class="mt-4 flex justify-between items-end">
-          <div class="text-xs text-skin-muted max-w-[70%] truncate">{{ signal.description }}</div>
-          <a [href]="getTradingViewUrl(signal.symbol)" target="_blank" rel="noopener noreferrer" class="text-skin-muted hover:text-skin-accent transition-colors text-xl" title="Open TradingView chart">📈</a>
-        </div>
-      </div>
-    }
     @if (isLoading()) {
       <div class="col-span-full flex justify-center items-center py-8">
         <div class="flex flex-col items-center">
@@ -384,6 +295,108 @@
           <div class="text-skin-muted">Loading signals...</div>
         </div>
       </div>
+    } @else if (filteredSignals().length === 0 && (isScanning() || lastScanTime())) {
+      <div class="col-span-full flex justify-center items-center py-12">
+        <div class="flex flex-col items-center text-center">
+          <div class="text-6xl mb-4 opacity-50">📊</div>
+          <div class="text-xl font-semibold text-skin-primary mb-2">No Signals Found</div>
+          <div class="text-sm text-skin-muted max-w-md">
+            No signals match your current filters or threshold settings. Try adjusting your filters or waiting for new signals.
+          </div>
+        </div>
+      </div>
+    } @else if (filteredSignals().length > 0) {
+      @for (signal of filteredSignals(); track signal.symbol + signal.timeframe + signal.timestamp.getTime()) {
+        <div class="rounded-xl shadow p-5 flex flex-col justify-between min-h-[320px] border-2"
+          [ngClass]="getSignalCardClass(signal.signalType)">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <div class="font-bold text-lg text-skin-primary">{{ signal.symbol }}</div>
+              <div class="text-xs text-skin-muted">{{ getTimeframeLabel(signal.timeframe) }}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">{{ getSignalIcon(signal) }}</span>
+              <span class="font-semibold text-base" [ngClass]="getSignalTypeColor(signal.signalType)">{{ signal.signalType }}</span>
+            </div>
+          </div>
+          <div class="space-y-1 mt-2">
+            <div class="flex justify-between text-sm">
+              <span class="text-skin-muted">Change ({{ getTimeframeLabel(signal.timeframe) }})</span>
+              <span [ngClass]="{
+                'text-green-500': signal.changePercent > 0,
+                'text-red-500': signal.changePercent < 0,
+                'text-skin-muted': signal.changePercent === 0
+              }">
+                <span class="text-xs">{{ signal.changePercent > 0 ? '▲' : signal.changePercent < 0 ? '▼' : '→' }}</span>
+                {{ signal.changePercent > 0 ? '+' : '' }}{{ signal.changePercent | number:'1.2-2' }}%
+              </span>
+            </div>
+             @if (signal.timeframeData) {
+               <div class="text-xs text-skin-muted mt-1 space-y-1">
+                 <div class="flex justify-between">
+                   <span>1m:</span>
+                   <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1M) }}</span>
+                 </div>
+                 <div class="flex justify-between">
+                   <span>5m:</span>
+                   <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF5M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF5M) }}</span>
+                 </div>
+                 <div class="flex justify-between">
+                   <span>15m:</span>
+                   <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF15M)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF15M) }}</span>
+                 </div>
+                 <div class="flex justify-between">
+                   <span>1h:</span>
+                   <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF1H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF1H) }}</span>
+                 </div>
+                 <div class="flex justify-between">
+                   <span>4h:</span>
+                   <span [ngClass]="getTimeframeChangeColor(signal, TIMEFRAMES.TF4H)">{{ formatTimeframeChange(signal, TIMEFRAMES.TF4H) }}</span>
+                 </div>
+               </div>
+             }
+            <div class="flex justify-between text-sm">
+              <span class="text-skin-muted">Volume</span>
+              <span class="text-xs" [ngClass]="{
+                'text-green-500': signal.volumeSpike > 3,
+                'text-yellow-500': signal.volumeSpike > 2 && signal.volumeSpike <= 3,
+                'text-skin-muted': signal.volumeSpike <= 2
+              }">{{ signal.volumeSpike | number:'1.1' }}x</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-skin-muted">Percentile</span>
+              <span class="text-xs font-semibold" [ngClass]="getPercentileColor(signal.thresholdPercentile)">{{ formatPercentile(signal.thresholdPercentile) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-skin-muted">Confidence</span>
+              <span class="font-semibold" [ngClass]="getConfidenceColor(signal.confidence)">{{ signal.confidence }}%</span>
+            </div>
+            <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+              <span class="text-skin-muted">Tick Freq</span>
+              <span class="text-xs text-skin-accent">{{ formatTickFrequency(signal.tickAnalysis.tickFrequency) }}</span>
+            </div>
+            <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+              <span class="text-skin-muted">Orders</span>
+              <span class="text-xs" [ngClass]="{
+                'text-green-500': signal.tickAnalysis.largeOrders > 10,
+                'text-yellow-500': signal.tickAnalysis.largeOrders > 5 && signal.tickAnalysis.largeOrders <= 10,
+                'text-skin-muted': signal.tickAnalysis.largeOrders <= 5
+              }">{{ signal.tickAnalysis.largeOrders }}</span>
+            </div>
+            <div class="flex justify-between text-sm" *ngIf="signal.tickAnalysis">
+              <span class="text-skin-muted">Pressure</span>
+              <span class="flex items-center gap-1">
+                <span>{{ getVolumePressureIcon(signal.tickAnalysis.volumePressure) }}</span>
+                <span class="text-xs" [ngClass]="getVolumePressureColor(signal.tickAnalysis.volumePressure)">{{ (signal.tickAnalysis.volumePressure * 100) | number:'1.0' }}%</span>
+              </span>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-between items-end">
+            <div class="text-xs text-skin-muted max-w-[70%] truncate">{{ signal.description }}</div>
+            <a [href]="getTradingViewUrl(signal.symbol)" target="_blank" rel="noopener noreferrer" class="text-skin-muted hover:text-skin-accent transition-colors text-xl" title="Open TradingView chart">📈</a>
+          </div>
+        </div>
+      }
     }
     </div>
   </div>
