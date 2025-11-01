@@ -1,4 +1,4 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
-      @for (_ of items; track $index) {
+      @for (_ of items(); track $index) {
         <div
           class="bg-skin-panel rounded-xl p-4 shadow-sm text-sm flex flex-col animate-pulse space-y-2"
         >
@@ -34,9 +34,9 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export class TickerCardSkeleton {
-  @Input() count = 4;
+  count = input<number>(4);
 
-  get items() {
-    return Array.from({ length: this.count });
-  }
+  items = computed(() => {
+    return Array.from({ length: this.count() });
+  });
 }

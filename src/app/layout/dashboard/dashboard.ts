@@ -9,7 +9,6 @@ import { RealTimeScanner } from '../../components/real-time-scanner/real-time-sc
 
 @Component({
   selector: 'mag-dashboard',
-  standalone: true,
   imports: [
     Header,
     Logo,

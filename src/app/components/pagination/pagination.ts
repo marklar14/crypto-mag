@@ -1,5 +1,14 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+export interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
 @Component({
   selector: 'mag-pagination',
@@ -8,18 +17,18 @@ import { CommonModule } from '@angular/common';
     <div class="flex items-center justify-between mt-4">
       <!-- Info -->
       <div class="text-sm text-skin-muted">
-        @if (pagination) {
-          Showing {{ startItem }}-{{ endItem }} of {{ pagination.total }} results
+        @if (pagination()) {
+          Showing {{ startItem() }}-{{ endItem() }} of {{ pagination()!.total }} results
         }
       </div>
 
       <!-- Pagination Controls -->
-      @if (pagination) {
+      @if (pagination()) {
         <div class="flex items-center gap-2">
           <!-- Previous Button -->
           <button
-            [disabled]="!pagination.hasPrev"
-            (click)="onPageChange.emit(pagination.page - 1)"
+            [disabled]="!pagination()!.hasPrev"
+            (click)="pageChange.emit(pagination()!.page - 1)"
             class="px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-skin-muted/20 hover:bg-skin-muted/30 text-skin-text"
           >
             ← Previous
@@ -27,15 +36,15 @@ import { CommonModule } from '@angular/common';
 
           <!-- Page Numbers -->
           <div class="flex gap-1">
-            @for (page of visiblePages; track page) {
+            @for (page of visiblePages(); track page) {
               @if (page === '...') {
                 <span class="px-3 py-2 text-skin-muted">...</span>
               } @else {
                 <button
-                  [class.bg-skin-accent]="page === pagination.page"
-                  [class.text-skin-text]="page === pagination.page"
-                  [class.text-skin-muted]="page !== pagination.page"
-                  (click)="onPageChange.emit(typeof page === 'number' ? page : 1)"
+                  [class.bg-skin-accent]="page === pagination()!.page"
+                  [class.text-skin-text]="page === pagination()!.page"
+                  [class.text-skin-muted]="page !== pagination()!.page"
+                  (click)="pageChange.emit(typeof page === 'number' ? page : 1)"
                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-skin-muted/20"
                 >
                   {{ page }}
@@ -46,8 +55,8 @@ import { CommonModule } from '@angular/common';
 
           <!-- Next Button -->
           <button
-            [disabled]="!pagination.hasNext"
-            (click)="onPageChange.emit(pagination.page + 1)"
+            [disabled]="!pagination()!.hasNext"
+            (click)="pageChange.emit(pagination()!.page + 1)"
             class="px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-skin-muted/20 hover:bg-skin-muted/30 text-skin-text"
           >
             Next →
@@ -65,32 +74,27 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class Pagination {
-  @Input() pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  } | null = null;
+  pagination = input<PaginationData | null>(null);
+  pageChange = output<number>();
 
-  @Output() onPageChange = new EventEmitter<number>();
+  startItem = computed(() => {
+    const pag = this.pagination();
+    if (!pag) return 0;
+    return (pag.page - 1) * pag.limit + 1;
+  });
 
-  get startItem(): number {
-    if (!this.pagination) return 0;
-    return (this.pagination.page - 1) * this.pagination.limit + 1;
-  }
+  endItem = computed(() => {
+    const pag = this.pagination();
+    if (!pag) return 0;
+    return Math.min(pag.page * pag.limit, pag.total);
+  });
 
-  get endItem(): number {
-    if (!this.pagination) return 0;
-    return Math.min(this.pagination.page * this.pagination.limit, this.pagination.total);
-  }
+  visiblePages = computed((): (number | string)[] => {
+    const pag = this.pagination();
+    if (!pag) return [];
 
-  get visiblePages(): (number | string)[] {
-    if (!this.pagination) return [];
-
-    const current = this.pagination.page;
-    const total = this.pagination.totalPages;
+    const current = pag.page;
+    const total = pag.totalPages;
     const pages: (number | string)[] = [];
 
     if (total <= 7) {
@@ -122,5 +126,5 @@ export class Pagination {
     }
 
     return pages;
-  }
+  });
 }
